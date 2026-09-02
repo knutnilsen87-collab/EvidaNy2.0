@@ -1,0 +1,20 @@
+{
+  "name": "evida-web",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "description": "EVIDA 2.0 frontend. Fase 2: kun migrert klientinfrastruktur (api/lib/domain). UI bygges i fase 3-4.",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hash-wasm": "4.12.0"
+  },
+  "devDependencies": {
+    "@xyflow/react": "^12.10.0",
+    "jsdom": "^24.1.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.9"
+  }
+}
