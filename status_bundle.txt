@@ -4,8 +4,10 @@ LAST_UPDATED_UTC: 2026-09-02
 LAST_UPDATED_BY: Claude Code (fase 1 / pre-fase-2-forberedelse)
 REPOSITORY: F:\prosjekter_MAIN\EvidaNy2.0
 CURRENT_BRANCH: master
-HEAD_COMMIT: (ingen commit ennå — initial commit lages etter at denne filen er opprettet; oppdateres i follow-up)
-WORKTREE_STATUS: alle fase 1-filer untracked, klare for initial commit
+HEAD_COMMIT: 494b31b758ae3da4cc84ddcbbb23f663d6842ae7 (phase 1 baseline)
+  + follow-up docs-commit for denne filen og CUTOVER_RECOMMENDATION.md —
+  verifiser alltid med git log; bundle refererer siste MATERIELLE commit
+WORKTREE_STATUS: clean etter follow-up-commit (kun ignorerte filer igjen)
 CURRENT_PHASE: Phase 1 complete / Phase 2 blocked
 CURRENT_GATE: Phase 2 cutover authorization (venter på eksplisitt godkjenning)
 PROJECT_STATE: SAFE_TO_CONTINUE (kun dokumentasjon/forberedelse tillatt)
