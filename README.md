@@ -26,8 +26,8 @@ Se `CLAUDE.md`. Kort versjon: verifiser, aldri anta; én autoritativ backend; Fl
 |---|---|---|
 | 0 — Inventar | Ferdig | `docs/INVENTORY.md` |
 | 1 — Skjelett og styringsdokumenter | Ferdig | `docs/progress/PHASE_1_REPORT.md` |
-| 2 — Backend-transplantasjon | Venter på cutover-SHA | — |
-| 3 — Designsystem | Ikke startet | — |
+| 2 — Backend-transplantasjon | Ferdig (cutover: `evida-v2-cutover` / `d92aef0`) | `docs/progress/PHASE_2_REPORT.md` |
+| 3 — Designsystem | Blokkert: specs mangler i `docs/spec/` | — |
 | 4 — API-klient og skjermer | Ikke startet | — |
 | 5 — Nye migrasjoner/endepunkter | Ikke startet | — |
 | 6 — Grounding-gate | Ikke startet | — |
