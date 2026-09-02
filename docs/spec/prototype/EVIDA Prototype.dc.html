@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #02060E; }
+  * { box-sizing: border-box; }
+  a { color: #7FB3FF; text-decoration: none; }
+  a:hover { color: #B6D6FF; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: rgba(96,165,250,0.25); border-radius: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  @keyframes evDrift { 0% { transform: translate3d(0,0,0); opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { transform: translate3d(60px,-180px,0); opacity: 0; } }
+  @keyframes evPulse { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
+  @keyframes evGlow { 0%,100% { box-shadow: 0 0 0 1px rgba(96,165,250,.35), 0 0 34px -12px rgba(59,130,246,.65); } 50% { box-shadow: 0 0 0 1px rgba(96,165,250,.6), 0 0 60px -8px rgba(59,130,246,.9); } }
+  @keyframes evDash { to { stroke-dashoffset: -400; } }
+  @keyframes evTyping { 0%,100% { transform: translateY(0); opacity:.4 } 50% { transform: translateY(-3px); opacity:1 } }
+  @keyframes evSweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(220%); } }
+  @keyframes evRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes evScan { 0% { top: 0%; opacity: 0 } 20% { opacity:.7 } 100% { top: 100%; opacity: 0 } }
+  @keyframes evRipple { from { transform: translate(-50%,-50%) scale(.2); opacity: .85; } to { transform: translate(-50%,-50%) scale(3.4); opacity: 0; } }
+  @keyframes evRisePop { from { opacity: 0; transform: translate(-50%,-96%); } to { opacity: 1; transform: translate(-50%,-100%); } }
+  @keyframes evRisePopDown { from { opacity: 0; transform: translate(-50%,8px); } to { opacity: 1; transform: translate(-50%,0); } }
+  @keyframes evRiseGhost { from { opacity: 0; transform: translate(-50%,-130%); } to { opacity: 1; transform: translate(-50%,-140%); } }
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="width: 1920px; height: 1080px; position: relative; overflow: hidden; background: radial-gradient(120% 90% at 78% 8%, rgba(25,64,120,.42) 0%, rgba(3,8,18,0) 62%), radial-gradient(90% 70% at 12% 96%, rgba(16,86,74,.3) 0%, rgba(3,8,18,0) 58%), #03080F; color: #E6EDF7; font-family: Geist, system-ui, sans-serif; display: flex;">
+
+  <div style="position: absolute; inset: 0; background-image: linear-gradient(rgba(96,165,250,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(96,165,250,.055) 1px, transparent 1px); background-size: 64px 64px; pointer-events: none;"></div>
+  <div style="position: absolute; inset: 0; pointer-events: none; overflow: hidden;">
+    <sc-for list="{{ particles }}" as="p" hint-placeholder-count="0">
+      <div style="position: absolute; left: {{ p.left }}%; top: {{ p.top }}%; width: {{ p.size }}px; height: {{ p.size }}px; border-radius: 50%; background: {{ p.color }}; box-shadow: 0 0 {{ p.blur }}px {{ p.color }}; animation: evDrift {{ p.dur }}s linear {{ p.delay }}s infinite;"></div>
+    </sc-for>
+  </div>
+
+  <div style="position: relative; width: 268px; flex: 0 0 268px; border-right: 1px solid rgba(96,165,250,.16); background: linear-gradient(180deg, rgba(8,17,32,.86), rgba(4,10,20,.7)); backdrop-filter: blur(18px); display: flex; flex-direction: column; padding: 28px 0 22px; opacity: {{ chromeOpacity }}; transition: opacity .2s ease;">
+    <div style="display: flex; align-items: center; gap: 14px; padding: 0 26px 30px;">
+      <div style="display: grid; gap: 4px;">
+        <div style="width: 20px; height: 2px; background: #60A5FA; box-shadow: 0 0 8px #3B82F6;"></div>
+        <div style="width: 20px; height: 2px; background: #60A5FA; box-shadow: 0 0 8px #3B82F6;"></div>
+        <div style="width: 20px; height: 2px; background: #25D0A6; box-shadow: 0 0 8px #25D0A6;"></div>
+      </div>
+      <div style="font-family: 'Instrument Serif', serif; font-size: 30px; letter-spacing: .16em; line-height: 1;">EVIDA</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 2px; padding: 0 14px;">
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="7">
+        <div onClick="{{ item.go }}" style="display: flex; align-items: center; gap: 14px; padding: 13px 14px; border-radius: 10px; cursor: {{ item.cursor }}; color: {{ item.color }}; background: {{ item.bg }}; border-left: 2px solid {{ item.mark }}; font-size: 16px; font-weight: 500; transition: background .18s, color .18s;" style-hover="background: rgba(96,165,250,.09); color: #DCE8F8;">
+          <span style="width: 18px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 13px; opacity: .85;">{{ item.glyph }}</span>
+          <span style="flex: 1;">{{ item.label }}</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .1em; color: #48607E;">{{ item.tag }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top: auto; padding: 0 26px;">
+      <div style="border: 1px solid rgba(96,165,250,.18); border-radius: 12px; padding: 14px 16px; background: rgba(10,22,40,.5);">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: #5C7794;">AKTIV SAK</div>
+        <div style="font-size: 15px; margin-top: 7px; line-height: 1.35;">Kirkerud mot Ås</div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #25D0A6; margin-top: 8px;">SAK-2023-0417 · 12 bilag</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; color: #6C86A4; font-size: 15px; margin-top: 18px; padding-left: 2px;">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px;">⚙</span> Innstillinger
+      </div>
+    </div>
+  </div>
+
+  <div style="position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column;">
+    <div style="height: 82px; flex: 0 0 82px; border-bottom: 1px solid rgba(96,165,250,.14); display: flex; align-items: center; gap: 18px; padding: 0 34px; background: rgba(5,12,24,.55); backdrop-filter: blur(14px); opacity: {{ chromeOpacity }}; transition: opacity .2s ease;">
+      <div style="font-family: 'Instrument Serif', serif; font-size: 27px; letter-spacing: .01em;">{{ screenTitle }}</div>
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .16em; color: #5C7794; padding-top: 4px;">{{ screenSub }}</div>
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 20px;">
+        <div onClick="{{ openPalette }}" style="display: flex; align-items: center; gap: 10px; border: 1px solid rgba(96,165,250,.22); border-radius: 9px; padding: 8px 13px; font-size: 14px; color: #8AA3C0; cursor: pointer;" style-hover="border-color: rgba(96,165,250,.5); color: #CFE0F5;">
+          <span>Søk eller kommando</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; border: 1px solid rgba(96,165,250,.3); border-radius: 5px; padding: 2px 6px;">⌘K</span>
+        </div>
+        <div onClick="{{ toggleDraft }}" style="display: flex; align-items: center; gap: 9px; border: 1px solid rgba(96,165,250,.22); border-radius: 9px; padding: 8px 13px; font-size: 14px; color: #A8BCD4; cursor: pointer;" style-hover="border-color: rgba(96,165,250,.5); color: #DCE8F8;">
+          <span>Utkast</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6EE7C8;">{{ draftCount }}</span>
+        </div>
+        <div onClick="{{ toggleSound }}" title="Funksjonelt lyddesign" style="width: 36px; height: 36px; border-radius: 9px; border: 1px solid rgba(96,165,250,.22); display: grid; place-items: center; font-size: 15px; color: {{ soundColor }}; cursor: pointer;" style-hover="border-color: rgba(96,165,250,.5);">{{ soundGlyph }}</div>
+        <div style="position: relative; color: #8AA3C0; font-size: 17px;">🔔<span style="position: absolute; top: -1px; right: -2px; width: 8px; height: 8px; border-radius: 50%; background: #3B82F6; box-shadow: 0 0 10px #3B82F6;"></span></div>
+        <div style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(96,165,250,.35); display: grid; place-items: center; font-size: 14px; color: #BFD6F2; background: rgba(20,40,70,.6);">AK</div>
+      </div>
+    </div>
+
+    <div style="position: relative; flex: 1; min-height: 0;">
+
+      <!-- 1 · ONBOARDING -->
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 54px; padding: 0 90px;">
+          <div style="text-align: center; max-width: 780px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .3em; color: #25D0A6;">KILDEBUNDET JURIDISK ARBEIDSROM</div>
+            <div style="font-family: 'Instrument Serif', serif; font-size: 62px; line-height: 1.08; margin-top: 20px;">Alt du skriver skal kunne spores tilbake til en kilde.</div>
+            <div style="font-size: 18px; color: #93A9C4; margin-top: 18px; line-height: 1.6; text-wrap: pretty;">EVIDA leser saksdokumentene dine, bygger sammenhengene og viser deg alltid hvor påstanden kommer fra.</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 34px; width: 100%; max-width: 1180px;">
+            <div onClick="{{ goUpload }}" style="position: relative; cursor: pointer; padding: 44px 40px 38px; border-radius: 20px; border: 1px solid rgba(96,165,250,.4); background: linear-gradient(160deg, rgba(18,38,70,.62), rgba(8,18,34,.5)); backdrop-filter: blur(22px); animation: evGlow 5.5s ease-in-out infinite; min-height: 320px; display: flex; flex-direction: column;" style-hover="border-color: rgba(147,197,253,.85);">
+              <div style="display: flex; align-items: center; gap: 18px;">
+                <div style="width: 62px; height: 62px; border-radius: 14px; border: 1px solid rgba(96,165,250,.5); display: grid; place-items: center; font-size: 27px; color: #93C5FD; background: rgba(30,58,105,.45); box-shadow: 0 0 30px -10px rgba(59,130,246,.9);">＋</div>
+                <div style="width: 54px; height: 44px; border-radius: 8px; border: 1px solid rgba(96,165,250,.35); display: grid; place-items: center; font-size: 22px; color: #7FB3FF;">🗂</div>
+              </div>
+              <div style="font-family: 'Instrument Serif', serif; font-size: 40px; margin-top: 30px; line-height: 1.1;">Start ny sak</div>
+              <div style="font-size: 16px; color: #93A9C4; margin-top: 12px; line-height: 1.6; max-width: 420px;">Opprett saksrom, last opp bilag og la EVIDA indeksere kildene før du begynner.</div>
+              <div style="margin-top: auto; display: flex; align-items: center; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .16em; color: #60A5FA; padding-top: 28px;">
+                <span>OPPRETT SAKSROM</span><span>→</span>
+              </div>
+            </div>
+
+            <div style="position: relative; padding: 36px 34px 30px; border-radius: 20px; border: 1px solid rgba(96,165,250,.24); background: linear-gradient(160deg, rgba(12,26,48,.55), rgba(6,14,28,.45)); backdrop-filter: blur(22px); min-height: 320px; display: flex; flex-direction: column;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="font-family: 'Instrument Serif', serif; font-size: 32px;">Fortsett tidligere sak</div>
+                <div style="width: 40px; height: 40px; border-radius: 10px; border: 1px solid rgba(96,165,250,.28); display: grid; place-items: center; color: #8AA3C0;">⌕</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 24px;">
+                <div onClick="{{ goCase }}" style="display: flex; align-items: center; gap: 16px; padding: 15px 16px; border-radius: 11px; border: 1px solid rgba(96,165,250,.3); background: rgba(20,42,74,.42); cursor: pointer;" style-hover="border-color: rgba(147,197,253,.7);">
+                  <span style="color: #7FB3FF; font-size: 17px;">▣</span>
+                  <div style="flex: 1;">
+                    <div style="font-size: 16px;">Kirkerud mot Ås — personskade etter sykkelulykke</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #5C7794; margin-top: 4px;">SAK-2023-0417 · 12 BILAG · SIST ÅPNET I DAG</div>
+                  </div>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #25D0A6;">INDEKSERT</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 16px; padding: 15px 16px; border-radius: 11px; border: 1px solid rgba(96,165,250,.14); opacity: .72;">
+                  <span style="color: #5C7794; font-size: 17px;">▤</span>
+                  <div style="flex: 1;">
+                    <div style="font-size: 16px; color: #B9C9DC;">Solheim Eiendom AS — mangelskrav</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4C6482; margin-top: 4px;">SAK-2023-0388 · 34 BILAG · 4 DAGER SIDEN</div>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 16px; padding: 15px 16px; border-radius: 11px; border: 1px solid rgba(96,165,250,.14); opacity: .55;">
+                  <span style="color: #5C7794; font-size: 17px;">▤</span>
+                  <div style="flex: 1;">
+                    <div style="font-size: 16px; color: #B9C9DC;">Nordby — oppsigelse i prøvetid</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4C6482; margin-top: 4px;">SAK-2023-0351 · 9 BILAG · 2 UKER SIDEN</div>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; color: #48607E; padding-top: 22px;">3 AV 18 SAKER VIST</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- 2 · OPPLASTING -->
+      <sc-if value="{{ isUpload }}">
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding: 52px 90px 40px;">
+          <div onClick="{{ startUpload }}" style="position: relative; width: 100%; max-width: 1080px; height: 340px; border-radius: 22px; border: 1px solid rgba(96,165,250,.5); background: linear-gradient(165deg, rgba(16,36,66,.55), rgba(6,14,28,.4)); backdrop-filter: blur(20px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; cursor: pointer; overflow: hidden; animation: evGlow 5s ease-in-out infinite;">
+            <div style="position: absolute; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(96,165,250,.8), transparent); animation: evScan 4.5s ease-in-out infinite;"></div>
+            <div style="display: flex; align-items: center; gap: 22px;">
+              <div style="font-size: 40px; color: #25D0A6; text-shadow: 0 0 24px #25D0A6;">＋</div>
+              <div style="width: 88px; height: 68px; border: 2px solid rgba(127,179,255,.75); border-radius: 10px; box-shadow: 0 0 34px -8px rgba(59,130,246,.9);"></div>
+            </div>
+            <div style="font-size: 34px; font-weight: 500; letter-spacing: .01em; text-align: center; line-height: 1.3; max-width: 700px;">Dra og slipp — eller last opp dokumenter her</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .18em; color: #6C86A4;">PDF · DOCX · TXT · EML — MAKS 250 MB PER FIL</div>
+          </div>
+
+          <div style="width: 100%; max-width: 1080px; margin-top: 34px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: .2em; color: #93A9C4;">DOKUMENTSTRØM</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5C7794;">{{ uploadStatus }}</div>
+          </div>
+
+          <div style="width: 100%; max-width: 1080px; margin-top: 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+            <sc-for list="{{ uploads }}" as="f" hint-placeholder-count="4">
+              <div style="border-radius: 14px; border: 1px solid {{ f.border }}; background: rgba(10,22,42,.55); backdrop-filter: blur(14px); padding: 16px 16px 14px; min-height: 132px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                  <span style="color: {{ f.tint }}; font-size: 15px;">▤</span>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #5C7794;">{{ f.size }}</span>
+                </div>
+                <div style="font-size: 13.5px; line-height: 1.4; color: #DCE8F8;">{{ f.name }}</div>
+                <div style="margin-top: auto; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .1em; color: {{ f.tint }};">{{ f.stage }}</div>
+                <div style="height: 3px; border-radius: 3px; background: rgba(96,165,250,.14); overflow: hidden;">
+                  <div style="height: 100%; width: {{ f.pct }}%; background: {{ f.tint }}; box-shadow: 0 0 10px {{ f.tint }};"></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="margin-top: auto; display: flex; align-items: center; gap: 28px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; color: #48607E;">SHA-256 VERIFISERT · DUPLIKATSJEKK · VIRUSSKANN</div>
+            <div onClick="{{ goCase }}" style="padding: 15px 30px; border-radius: 11px; border: 1px solid {{ ctaBorder }}; color: {{ ctaColor }}; background: {{ ctaBg }}; cursor: pointer; font-size: 15px; letter-spacing: .04em;">Åpne saksrommet →</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- 3 · 4 · 6 · CHAT SOM HOVEDFLATE -->
+      <sc-if value="{{ isChat }}">
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;">
+
+          <sc-if value="{{ showFocusStrip }}">
+            <div style="width: 1020px; flex: 0 0 auto; display: flex; align-items: center; gap: 16px; margin-top: 22px; border: 1px solid rgba(96,165,250,.22); border-radius: 12px; background: rgba(12,26,48,.55); backdrop-filter: blur(14px); padding: 14px 20px; opacity: {{ chromeOpacity }}; transition: opacity .2s ease;">
+              <div style="width: 28px; height: 28px; border-radius: 9px; border: 1px solid rgba(37,208,166,.5); display: grid; place-items: center; color: #6EE7C8; font-size: 12px;">◆</div>
+              <div style="flex: 1;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .16em; color: #5C7794;">FELLES FOKUS</div>
+                <div style="font-size: 14.5px; margin-top: 5px;">Fastslå tidspunktet for sammenstøtet</div>
+              </div>
+              <div style="width: 220px;">
+                <div style="height: 3px; border-radius: 3px; background: rgba(96,165,250,.16); overflow: hidden;"><div style="height: 100%; width: 64%; background: linear-gradient(90deg,#3B82F6,#25D0A6); box-shadow: 0 0 12px #3B82F6;"></div></div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #6C86A4; margin-top: 7px;">EVIDA SAMMENLIGNER BILAG 2 OG BILAG 3</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <div data-chatscroll="1" ref="{{ chatScrollRef }}" style="flex: 1; min-height: 0; width: 100%; overflow-y: auto; display: flex; justify-content: center; padding: 26px 0 8px;">
+            <div style="width: 1020px; display: flex; flex-direction: column; gap: 26px; height: fit-content;">
+              <sc-for list="{{ chatMsgs }}" as="m" hint-placeholder-count="3">
+                <div data-msg="{{ m.idx }}" style="align-self: {{ m.align }}; max-width: {{ m.max }}; display: flex; flex-direction: column; gap: 9px; animation: evRise .35s ease both;">
+                  <div style="display: flex; align-items: center; gap: 12px; align-self: {{ m.align }};">
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .16em; color: {{ m.whoColor }};">{{ m.who }}</span>
+                    <sc-if value="{{ m.hasConf }}" hint-placeholder-val="{{ true }}">
+                      <span style="font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: .12em; color: {{ m.confColor }}; background: {{ m.confBg }}; border: 1px solid {{ m.confBorder }}; border-radius: 999px; padding: 4px 10px;">{{ m.confText }}</span>
+                    </sc-if>
+                  </div>
+                  <div style="border-radius: 14px; border: 1px solid {{ m.border }}; background: {{ m.bg }}; padding: 20px 24px; transition: border-color .18s;">
+                    <div style="font-size: 17px; line-height: 1.7; color: #E6EDF7; text-wrap: pretty;">{{ m.text }}</div>
+
+                    <sc-if value="{{ m.hasPoints }}" hint-placeholder-val="{{ true }}">
+                      <div style="display: flex; flex-direction: column; gap: 20px; margin-top: 22px;">
+                        <sc-for list="{{ m.points }}" as="p" hint-placeholder-count="4">
+                          <div style="border-left: 2px solid rgba(96,165,250,.45); padding-left: 18px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                              <span style="font-family: 'Instrument Serif', serif; font-size: 21px;">{{ p.label }}</span>
+                              <span style="font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: .12em; color: {{ p.confColor }}; background: {{ p.confBg }}; border: 1px solid {{ p.confBorder }}; border-radius: 999px; padding: 4px 10px;">{{ p.confText }}</span>
+                              <span onClick="{{ p.add }}" style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .12em; color: #7FB3FF; border: 1px solid rgba(96,165,250,.3); border-radius: 6px; padding: 5px 10px; cursor: pointer;" style-hover="border-color: #93C5FD; color: #DCE8F8;">＋ UTKAST</span>
+                            </div>
+                            <div style="font-size: 16px; line-height: 1.65; color: #D6E2F1; margin-top: 9px; text-wrap: pretty;">{{ p.text }}</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 13px;">
+                              <sc-for list="{{ p.pills }}" as="q" hint-placeholder-count="2">
+                          <div onClick="{{ q.open }}" onMouseEnter="{{ q.enter }}" onMouseLeave="{{ q.leave }}" onMouseDown="{{ q.down }}" style="display: flex; align-items: center; gap: 9px; border: 1px solid {{ q.border }}; background: {{ q.bg }}; border-radius: 999px; padding: 8px 15px 8px 12px; cursor: grab; transition: border-color .18s, background .18s, transform .18s;" style-hover="transform: translateY(-2px);">
+                            <span style="color: #7FB3FF; font-size: 13px;">▤</span>
+                            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .06em; color: #BFD6F2;">{{ q.label }}</span>
+                          </div>
+                              </sc-for>
+                            </div>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+
+                    <sc-if value="{{ m.isConflict }}" hint-placeholder-val="{{ true }}">
+                      <div style="margin-top: 20px; border: 1px solid rgba(240,182,92,.45); border-radius: 14px; background: rgba(34,25,10,.5); padding: 20px 22px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                          <span style="color: #F0B65C; font-size: 15px;">⚠</span>
+                          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .18em; color: #F0B65C;">MOTSTRID · TIDSPUNKT FOR SAMMENSTØTET</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px;">
+                          <div onClick="{{ openB2 }}" style="border: 1px solid rgba(96,165,250,.32); border-radius: 11px; background: rgba(9,20,38,.6); padding: 16px 18px; cursor: pointer;" style-hover="border-color: #93C5FD;">
+                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: #7FB3FF;">LARS HOLM · BILAG 2, S. 4</div>
+                            <div style="font-family: 'Instrument Serif', serif; font-size: 30px; margin-top: 8px;">07:45</div>
+                            <div style="font-size: 14px; line-height: 1.55; color: #C9D8EA; margin-top: 8px;">«Eg såg på klokka rett etterpå. Den var 07:45.» Presis, med begrunnelse.</div>
+                          </div>
+                          <div onClick="{{ openB3 }}" style="border: 1px solid rgba(240,182,92,.4); border-radius: 11px; background: rgba(30,22,10,.55); padding: 16px 18px; cursor: pointer;" style-hover="border-color: #F0B65C;">
+                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: #F0B65C;">INGRID BERG · BILAG 3, S. 2</div>
+                            <div style="font-family: 'Instrument Serif', serif; font-size: 30px; margin-top: 8px;">«rundt åtte»</div>
+                            <div style="font-size: 14px; line-height: 1.55; color: #E0D2BA; margin-top: 8px;">Ingen klokkeslett, ingen uavhengig bekreftelse.</div>
+                          </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
+                          <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: #6C86A4;">STØTTER 07:45</span>
+                          <div onClick="{{ openB11 }}" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #BFD6F2; border: 1px solid rgba(37,208,166,.4); border-radius: 999px; padding: 6px 12px; cursor: pointer;" style-hover="border-color: #6EE7C8;">Bilag 11 — logg 07:52</div>
+                          <div onClick="{{ openB7 }}" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #BFD6F2; border: 1px solid rgba(37,208,166,.4); border-radius: 999px; padding: 6px 12px; cursor: pointer;" style-hover="border-color: #6EE7C8;">Bilag 7 — førers egen melding</div>
+                        </div>
+                        <sc-if value="{{ conflictOpen }}" hint-placeholder-val="{{ true }}">
+                          <div style="display: flex; gap: 10px; margin-top: 18px;">
+                            <div onClick="{{ resolveHolm }}" style="padding: 11px 18px; border-radius: 9px; border: 1px solid rgba(37,208,166,.55); background: rgba(9,44,38,.5); font-size: 14px; cursor: pointer;" style-hover="border-color: #6EE7C8;">Legg 07:45 til grunn</div>
+                            <div onClick="{{ resolveBoth }}" style="padding: 11px 18px; border-radius: 9px; border: 1px solid rgba(96,165,250,.3); font-size: 14px; cursor: pointer; color: #A8BCD4;" style-hover="border-color: #93C5FD;">Behold begge som usikre</div>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{ conflictDone }}">
+                          <div style="margin-top: 18px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; color: #6EE7C8; border-top: 1px solid rgba(37,208,166,.25); padding-top: 14px;">{{ conflictVerdict }}</div>
+                        </sc-if>
+                      </div>
+                    </sc-if>
+
+                    <sc-if value="{{ m.hasPills }}" hint-placeholder-val="{{ true }}">
+                      <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px;">
+                        <sc-for list="{{ m.pills }}" as="p" hint-placeholder-count="2">
+                          <div onClick="{{ p.open }}" onMouseEnter="{{ p.enter }}" onMouseLeave="{{ p.leave }}" onMouseDown="{{ p.down }}" style="display: flex; align-items: center; gap: 9px; border: 1px solid {{ p.border }}; background: {{ p.bg }}; border-radius: 999px; padding: 8px 15px 8px 12px; cursor: grab; transition: border-color .18s, background .18s, transform .18s;" style-hover="transform: translateY(-2px);">
+                            <span style="color: #7FB3FF; font-size: 13px;">▤</span>
+                            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .06em; color: #BFD6F2;">{{ p.label }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+
+                    <sc-if value="{{ m.canAdd }}" hint-placeholder-val="{{ true }}">
+                      <div onClick="{{ m.add }}" style="display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .12em; color: #6C86A4; cursor: pointer;" style-hover="color: #BFD6F2;">＋ LEGG I UTKAST</div>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ chatTyping }}">
+                <div style="display: flex; align-items: center; gap: 6px; padding-left: 4px;">
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: #25D0A6; animation: evTyping 1s ease-in-out infinite;"></span>
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: #25D0A6; animation: evTyping 1s ease-in-out .15s infinite;"></span>
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: #25D0A6; animation: evTyping 1s ease-in-out .3s infinite;"></span>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6C86A4; margin-left: 6px;">EVIDA ARBEIDER</span>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+
+          <div style="width: 1020px; flex: 0 0 auto; padding: 10px 0 24px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 9px; padding-bottom: 12px;">
+              <sc-for list="{{ suggestions }}" as="sug" hint-placeholder-count="4">
+                <div onClick="{{ sug.run }}" style="padding: 9px 14px; border-radius: 999px; border: 1px solid rgba(96,165,250,.28); font-size: 13.5px; cursor: pointer;" style-hover="border-color: #93C5FD;">{{ sug.label }}</div>
+              </sc-for>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px; border: 1px solid rgba(96,165,250,.34); border-radius: 13px; background: rgba(8,18,34,.65); backdrop-filter: blur(12px); padding: 18px 20px; color: #7E97B4; font-size: 15.5px;">
+              <span style="color: #6EE7C8; font-size: 14px;">◆</span>
+              <span style="flex: 1;">{{ composerText }}</span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; border: 1px solid rgba(96,165,250,.28); border-radius: 5px; padding: 3px 7px;">⌘K</span>
+              <span style="color: #60A5FA;">➤</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px; margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: #4C6482;">
+              <span>J / K BLA I SVAR</span><span>⏎ ÅPNE KILDE</span><span>U UTKAST</span><span>⌘K KOMMANDO</span><span>DRA EN PILLE FOR Å FLYTTE KILDEN</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- 5 · SAKSLERRETET -->
+      <sc-if value="{{ isCanvas }}">
+        <div ref="{{ canvasRef }}" onWheel="{{ onWheel }}" style="position: absolute; inset: 0; overflow: hidden;">
+          <div style="position: absolute; inset: 0; background-image: linear-gradient(rgba(96,165,250,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(96,165,250,.05) 1px, transparent 1px); background-size: 32px 32px;"></div>
+
+          <div style="position: absolute; left: 0; right: 0; top: 30%; height: 1px; background: linear-gradient(90deg, transparent, rgba(96,165,250,.55), rgba(96,165,250,.55), transparent); opacity: {{ morphAxis }}; transition: opacity .35s ease; z-index: 2;"></div>
+          <sc-for list="{{ axisTicks }}" as="t" hint-placeholder-count="0">
+            <div style="position: absolute; left: {{ t.left }}%; top: 30%; transform: translate(-50%, -160%); z-index: 2; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .12em; color: #8AA3C0; opacity: {{ morphAxis }}; transition: opacity .35s ease; white-space: nowrap;">{{ t.text }}</div>
+          </sc-for>
+          <div style="position: absolute; left: 72%; top: 2%; transform: translateX(-50%); z-index: 2; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .18em; color: #F0785C; opacity: {{ unsureLabelOpacity }}; transition: opacity .35s ease; white-space: nowrap;">USIKKERT TIDSPUNKT</div>
+
+          <div style="position: absolute; inset: 0; transform: scale({{ zoomScale }}); transform-origin: {{ zoomOrigin }}; opacity: {{ diveFade }}; transition: transform .5s cubic-bezier(.22,.68,.3,1), opacity .5s ease; will-change: transform;">
+          <svg viewBox="0 0 1652 998" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;">
+            <sc-for list="{{ edges }}" as="e" hint-placeholder-count="0">
+              <path d="{{ e.d }}" fill="none" stroke="{{ e.stroke }}" stroke-width="{{ e.w }}" stroke-dasharray="{{ e.dash }}" opacity="{{ e.op }}"></path>
+            </sc-for>
+            <path ref="{{ wireRef }}" d="" fill="none" stroke="#BFDBFE" stroke-width="2" stroke-dasharray="6 6" opacity=".9"></path>
+          </svg>
+          <sc-for list="{{ ripples }}" as="r" hint-placeholder-count="0">
+            <div style="position: absolute; left: {{ r.left }}%; top: {{ r.top }}%; width: 180px; height: 180px; margin: -90px 0 0 -90px; border-radius: 50%; border: 1px solid rgba(147,197,253,.8); box-shadow: 0 0 40px -6px rgba(96,165,250,.8); pointer-events: none; z-index: 5; animation: evRipple .95s cubic-bezier(.2,.7,.3,1) forwards;"></div>
+          </sc-for>
+          <sc-for list="{{ edgeLabels }}" as="l" hint-placeholder-count="0">
+            <div style="position: absolute; left: {{ l.left }}%; top: {{ l.top }}%; transform: translate(-50%,-50%); z-index: 6; white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: {{ l.color }}; background: rgba(3,8,16,.82); padding: 2px 6px; border-radius: 4px; pointer-events: none;">{{ l.text }}</div>
+          </sc-for>
+          <sc-for list="{{ nodes }}" as="n" hint-placeholder-count="0">
+            <div onClick="{{ n.select }}" onDoubleClick="{{ n.dive }}" onMouseEnter="{{ n.hover }}" style="position: absolute; left: {{ n.left }}%; top: {{ n.top }}%; transform: translate(-50%,-50%); z-index: 3; width: {{ n.w }}px; border-radius: 9px; border: 1px {{ n.bstyle }} {{ n.border }}; background: rgba(9,20,38,.82); backdrop-filter: blur(10px); padding: 9px 11px; cursor: pointer; box-shadow: {{ n.shadow }}; transition: left .55s cubic-bezier(.22,.68,.3,1), top .55s cubic-bezier(.22,.68,.3,1), border-color .2s, box-shadow .2s;" style-hover="border-color: #BFDBFE;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .12em; color: {{ n.tint }}; flex: 1;">{{ n.kind }}</div>
+                <div onMouseDown="{{ n.startThread }}" title="Dra en relasjonstråd" style="width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(147,197,253,.55); cursor: crosshair;" style-hover="background: rgba(147,197,253,.55);"></div>
+              </div>
+              <div style="font-size: 12.5px; line-height: 1.35; color: #DCE8F8; margin-top: 4px;">{{ n.title }}</div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #5C7794; margin-top: 5px;">{{ n.cite }}</div>
+            </div>
+          </sc-for>
+          </div>
+
+          <div style="position: absolute; left: 26px; top: 22px; z-index: 8; display: flex; align-items: center; gap: 12px;">
+            <div onClick="{{ toggleLayout }}" style="padding: 11px 18px; border-radius: 10px; border: 1px solid rgba(96,165,250,.4); background: rgba(9,20,38,.8); backdrop-filter: blur(12px); font-size: 14px; white-space: nowrap; cursor: pointer;" style-hover="border-color: #93C5FD;">▦ {{ layoutLabel }}</div>
+            <div style="padding: 11px 16px; border-radius: 10px; border: 1px solid rgba(96,165,250,.2); background: rgba(9,20,38,.7); font-family: 'JetBrains Mono', monospace; font-size: 11px; white-space: nowrap; color: #8AA3C0;">{{ canvasStats }}</div>
+            <div style="padding: 11px 14px; border-radius: 10px; border: 1px solid rgba(37,208,166,.28); background: rgba(9,26,30,.7); font-family: 'JetBrains Mono', monospace; font-size: 11px; white-space: nowrap; color: #6EE7C8;">ZOOM {{ zoomLabel }}</div>
+          </div>
+
+          <div style="position: absolute; right: 26px; top: 22px; z-index: 8; display: flex; flex-direction: column; gap: 8px; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; background: rgba(9,20,38,.78); backdrop-filter: blur(12px); padding: 14px 16px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .16em; color: #5C7794;">RELASJONER</div>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;"><span style="width: 22px; height: 2px; background: #25D0A6;"></span> BEVISER</div>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;"><span style="width: 22px; height: 2px; background: #F0785C;"></span> MOTSIER</div>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;"><span style="width: 22px; height: 2px; background: #60A5FA;"></span> REFERERER TIL</div>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #93A9C4;"><span style="width: 22px; height: 0; border-top: 2px dashed #F0785C;"></span> USIKKER HENDELSE</div>
+          </div>
+
+          <div style="position: absolute; left: 26px; bottom: 24px; z-index: 8; display: flex; align-items: center; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; color: #6C86A4; background: rgba(5,12,24,.7); border: 1px solid rgba(96,165,250,.18); border-radius: 9px; padding: 10px 14px; white-space: nowrap;">{{ zoomHint }}</div>
+          <div style="position: absolute; right: 26px; bottom: 24px; z-index: 8; display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; color: #93C5FD; background: rgba(5,12,24,.7); border: 1px solid rgba(96,165,250,.18); border-radius: 9px; padding: 10px 14px; white-space: nowrap;">DRA I NODENS RING FOR Å KOBLE RELASJON</div>
+
+          <sc-if value="{{ hasSelection }}">
+            <div style="position: absolute; left: {{ popLeft }}%; top: {{ popTop }}%; z-index: 12; width: 420px; border-radius: 14px; border: 1px solid rgba(147,197,253,.5); background: rgba(7,16,32,.94); backdrop-filter: blur(20px); padding: 20px 22px; box-shadow: 0 30px 70px -20px rgba(0,0,0,.9);">
+              <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <div style="flex: 1;">
+                  <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: #60A5FA;">{{ selKind }}</div>
+                  <div style="font-size: 18px; margin-top: 6px; line-height: 1.35;">{{ selTitle }}</div>
+                </div>
+                <div onClick="{{ clearSelection }}" style="color: #8497B0; cursor: pointer; font-size: 16px; padding: 2px 4px;" style-hover="color: #DCE8F8;">✕</div>
+              </div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: #5C7794; margin-top: 18px;">UTDRAG FRA KILDEN</div>
+              <div style="border-left: 2px solid rgba(96,165,250,.7); padding-left: 14px; margin-top: 10px; font-size: 14.5px; line-height: 1.6; color: #C9D8EA;">{{ selSnippet }}</div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(96,165,250,.14);">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7FB3FF;">{{ selCite }}</div>
+                <div onClick="{{ goWar }}" style="font-size: 13px; color: #93C5FD; cursor: pointer;" style-hover="color: #DCE8F8;">Åpne i Saksrom →</div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- 8 · ARBEIDSLERRET -->
+      <sc-if value="{{ isBoard }}">
+        <div ref="{{ boardHost }}" style="position: absolute; inset: 0; overflow: hidden;">
+          <div style="position: absolute; inset: 0; background-image: linear-gradient(rgba(96,165,250,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(96,165,250,.05) 1px, transparent 1px); background-size: 40px 40px;"></div>
+
+          <svg viewBox="0 0 1652 998" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2;">
+            <sc-for list="{{ boardLinks }}" as="l" hint-placeholder-count="3">
+              <path d="{{ l.d }}" fill="none" stroke="{{ l.stroke }}" stroke-width="{{ l.w }}" stroke-dasharray="{{ l.dash }}" stroke-linecap="round" opacity=".95"></path>
+              <polygon points="{{ l.head }}" fill="{{ l.stroke }}" opacity=".95"></polygon>
+            </sc-for>
+            <sc-if value="{{ wireOn }}">
+              <path d="{{ wireD }}" fill="none" stroke="{{ wireColor }}" stroke-width="2" stroke-dasharray="7 6" stroke-linecap="round" opacity=".9"></path>
+            </sc-if>
+          </svg>
+
+          <sc-for list="{{ boardLabels }}" as="lb" hint-placeholder-count="3">
+            <div onClick="{{ lb.remove }}" title="Klikk for å fjerne relasjonen" style="position: absolute; left: {{ lb.left }}px; top: {{ lb.top }}px; transform: translate(-50%,-50%); z-index: 5; display: flex; align-items: center; gap: 7px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .12em; color: {{ lb.color }}; background: rgba(3,8,16,.88); border: 1px solid rgba(255,255,255,.08); padding: 4px 9px; border-radius: 999px; cursor: pointer; white-space: nowrap;" style-hover="border-color: rgba(255,255,255,.3);">
+              <span>{{ lb.text }}</span><span style="opacity: .5;">✕</span>
+            </div>
+          </sc-for>
+
+          <sc-for list="{{ boardBoxes }}" as="b" hint-placeholder-count="8">
+            <div onMouseDown="{{ b.drag }}" style="position: absolute; left: {{ b.x }}px; top: {{ b.y }}px; width: {{ b.w }}px; height: {{ b.h }}px; z-index: {{ b.z }}; border-radius: 13px; border: 1px {{ b.bstyle }} {{ b.border }}; background: linear-gradient(160deg, rgba(14,30,55,.94), rgba(7,16,32,.92)); backdrop-filter: blur(12px); box-shadow: {{ b.shadow }}; padding: 13px 15px; cursor: grab; user-select: none; display: flex; flex-direction: column; transition: border-color .18s, box-shadow .18s;" style-hover="border-color: #BFDBFE;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <sc-if value="{{ b.hasSeq }}" hint-placeholder-val="{{ true }}">
+                  <span style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(181,140,240,.7); color: #C9AEF7; font-family: 'JetBrains Mono', monospace; font-size: 10px; display: grid; place-items: center;">{{ b.seq }}</span>
+                </sc-if>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: .14em; color: #7FB3FF; flex: 1;">{{ b.kind }}</span>
+                <span onMouseDown="{{ b.wire }}" title="Dra en relasjon herfra" style="width: 15px; height: 15px; border-radius: 50%; border: 1px solid rgba(147,197,253,.6); cursor: crosshair;" style-hover="background: rgba(147,197,253,.6);"></span>
+              </div>
+              <div style="font-size: 14.5px; line-height: 1.35; color: #E6EDF7; margin-top: 8px;">{{ b.title }}</div>
+              <div style="margin-top: auto; display: flex; align-items: center; gap: 10px;">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #5C7794;">{{ b.cite }}</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: #48607E;">{{ b.refText }}</span>
+                <sc-if value="{{ b.hasBadge }}" hint-placeholder-val="{{ true }}">
+                  <span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .1em; color: {{ b.badgeColor }};">{{ b.badge }}</span>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+
+          <div style="position: absolute; left: 26px; top: 22px; z-index: 20; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px; border: 1px solid rgba(96,165,250,.2); border-radius: 12px; background: rgba(7,16,32,.86); backdrop-filter: blur(14px); padding: 10px 12px;">
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .16em; color: #5C7794; padding: 0 6px;">RELASJON</span>
+              <sc-for list="{{ linkTypes }}" as="t" hint-placeholder-count="5">
+                <div onClick="{{ t.pick }}" style="display: flex; align-items: center; gap: 8px; border: 1px solid {{ t.bord }}; background: {{ t.bg }}; border-radius: 999px; padding: 8px 13px; cursor: pointer; white-space: nowrap;" style-hover="border-color: rgba(255,255,255,.4);">
+                  <span style="width: 18px; height: 2px; background: {{ t.color }};"></span>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: .1em; color: #CFE0F5;">{{ t.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: .1em; color: #6C86A4; padding-left: 4px;">
+              <span style="color: {{ activeColor }};">{{ activeLabel }}</span><span>{{ activeFn }}</span>
+            </div>
+          </div>
+
+          <div style="position: absolute; right: 26px; top: 22px; z-index: 20; display: flex; align-items: center; gap: 10px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8AA3C0; border: 1px solid rgba(96,165,250,.2); border-radius: 10px; background: rgba(7,16,32,.8); padding: 11px 14px; white-space: nowrap;">{{ boardStats }}</div>
+            <sc-if value="{{ boardConflict }}">
+              <div onClick="{{ resolveBoardConflict }}" style="font-size: 13.5px; color: #F0B65C; border: 1px solid rgba(240,182,92,.5); border-radius: 10px; background: rgba(38,28,10,.7); padding: 11px 16px; cursor: pointer; white-space: nowrap;" style-hover="border-color: #F0B65C;">⚠ Avklar motstrid</div>
+            </sc-if>
+            <div onClick="{{ clearBoard }}" style="font-size: 13.5px; color: #A8BCD4; border: 1px solid rgba(96,165,250,.24); border-radius: 10px; padding: 11px 16px; cursor: pointer; white-space: nowrap;" style-hover="border-color: #93C5FD;">Nullstill</div>
+          </div>
+
+          <div style="position: absolute; left: 26px; bottom: 24px; z-index: 20; display: flex; align-items: center; gap: 20px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: .14em; color: #5C7794; background: rgba(5,12,24,.72); border: 1px solid rgba(96,165,250,.16); border-radius: 10px; padding: 11px 16px; white-space: nowrap;">
+            <span>DRA BOKSEN FOR Å FLYTTE</span><span>DRA RINGEN FOR Å KOBLE</span><span>KLIKK EN ETIKETT FOR Å FJERNE RELASJONEN</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- 7 · PROSESSKRIV -->
+      <sc-if value="{{ isReport }}">
+        <div style="position: absolute; inset: 0; overflow-y: auto; display: flex; justify-content: center; padding: 34px 0 60px;">
+          <div style="width: 900px;">
+            <div style="display: flex; align-items: center; gap: 16px; padding-bottom: 20px;">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .2em; color: #7FB3FF;">SAMMENSTILT AV EVIDA · ALLE PÅSTANDER HAR FOTNOTE</div>
+              <div onClick="{{ exportReport }}" style="margin-left: auto; padding: 12px 22px; border-radius: 10px; border: 1px solid rgba(147,197,253,.7); background: linear-gradient(120deg, rgba(30,64,116,.75), rgba(14,32,60,.6)); font-size: 14.5px; cursor: pointer;" style-hover="border-color: #BFDBFE;">{{ exportLabel }}</div>
+            </div>
+            <div style="background: #FCFBF7; color: #16202C; box-shadow: 0 30px 70px -34px rgba(0,0,0,.8); padding: 76px 84px 88px;">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .18em; color: #7A8492;">BERGEN TINGRETT · SAK-2023-0417 · KIRKERUD MOT ÅS</div>
+              <div style="font-family: 'Instrument Serif', serif; font-size: 38px; margin-top: 20px;">Prosesskriv — utkast</div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5A6472; margin-top: 8px;">Utarbeidet 01.10.2023 · Advokat A. Kristiansen</div>
+              <div style="height: 1px; background: rgba(20,30,45,.14); margin: 30px 0 32px;"></div>
+
+              <div style="font-family: 'Instrument Serif', serif; font-size: 25px;">1. Sakens faktiske side</div>
+              <div style="display: flex; flex-direction: column; gap: 18px; margin-top: 18px;">
+                <sc-for list="{{ reportPoints }}" as="r" hint-placeholder-count="4">
+                  <div style="font-size: 16.5px; line-height: 1.8;">
+                    {{ r.text }}<sup style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #1F4F8A;">[{{ r.n }}]</sup>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .12em; color: {{ r.color }}; margin-top: 6px;">{{ r.conf }}</div>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ hasReportDraft }}">
+                  <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <sc-for list="{{ reportDraft }}" as="d" hint-placeholder-count="0">
+                      <div style="font-size: 16.5px; line-height: 1.8;">{{ d.text }}<sup style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #1F4F8A;">[{{ d.n }}]</sup></div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+
+              <div style="font-family: 'Instrument Serif', serif; font-size: 25px; margin-top: 42px;">2. Kronologi</div>
+              <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 18px;">
+                <sc-for list="{{ chronoRows }}" as="c" hint-placeholder-count="6">
+                  <div style="display: flex; gap: 18px; font-size: 15.5px; line-height: 1.7; border-bottom: 1px solid rgba(20,30,45,.09); padding-bottom: 12px;">
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5A6472; width: 96px; flex: 0 0 96px; padding-top: 3px;">{{ c.date }}</span>
+                    <span style="flex: 1;">{{ c.text }}</span>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7A8492; width: 130px; flex: 0 0 130px; text-align: right; padding-top: 3px;">{{ c.cite }}</span>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="font-family: 'Instrument Serif', serif; font-size: 25px; margin-top: 42px;">3. Bevismatrise</div>
+              <div style="display: flex; flex-direction: column; margin-top: 18px; border: 1px solid rgba(20,30,45,.14);">
+                <div style="display: flex; background: rgba(20,30,45,.06); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: #5A6472;">
+                  <span style="flex: 1; padding: 12px 16px;">FAKTUM</span>
+                  <span style="width: 150px; flex: 0 0 150px; padding: 12px 16px;">KILDE</span>
+                  <span style="width: 120px; flex: 0 0 120px; padding: 12px 16px;">STYRKE</span>
+                </div>
+                <sc-for list="{{ reportRows }}" as="row" hint-placeholder-count="5">
+                  <div style="display: flex; font-size: 15px; border-top: 1px solid rgba(20,30,45,.1);">
+                    <span style="flex: 1; padding: 13px 16px;">{{ row.faktum }}</span>
+                    <span style="width: 150px; flex: 0 0 150px; padding: 13px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5A6472;">{{ row.kilde }}</span>
+                    <span style="width: 120px; flex: 0 0 120px; padding: 13px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{ row.color }};">{{ row.styrke }}</span>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .16em; color: #7A8492; margin-top: 46px;">FOTNOTER</div>
+              <div style="display: flex; flex-direction: column; gap: 7px; margin-top: 14px;">
+                <sc-for list="{{ reportFootnotes }}" as="fn" hint-placeholder-count="4">
+                  <div style="font-size: 13.5px; color: #3A4553;"><span style="font-family: 'JetBrains Mono', monospace; color: #1F4F8A;">[{{ fn.n }}]</span> {{ fn.cite }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- PLACEHOLDER MODULES -->
+      <sc-if value="{{ isSoon }}">
+        <div style="position: absolute; inset: 0; display: grid; place-items: center;">
+          <div style="text-align: center; max-width: 520px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .24em; color: #5C7794;">IKKE MED I DENNE PROTOTYPEN</div>
+            <div style="font-family: 'Instrument Serif', serif; font-size: 44px; margin-top: 16px;">{{ soonTitle }}</div>
+            <div style="font-size: 16px; color: #8497B0; margin-top: 14px; line-height: 1.6;">{{ soonBody }}</div>
+            <div onClick="{{ goCase }}" style="display: inline-block; margin-top: 26px; padding: 13px 24px; border-radius: 10px; border: 1px solid rgba(96,165,250,.4); font-size: 14.5px; cursor: pointer;" style-hover="border-color: #93C5FD;">Tilbake til saksrommet</div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- KILDEFORHÅNDSVISNING -->
+  <sc-if value="{{ hoverOpen }}">
+    <div style="position: absolute; left: {{ hoverX }}px; top: {{ hoverY }}px; transform: {{ hoverShift }}; margin-top: {{ hoverGap }}; width: 500px; z-index: 45; pointer-events: none; border-radius: 14px; border: 1px solid rgba(147,197,253,.5); background: rgba(6,14,28,.97); box-shadow: 0 28px 70px -22px rgba(0,0,0,.95); padding: 20px 22px; animation: {{ hoverAnim }} .16s ease both;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: #60A5FA;">{{ hoverCite }}</span>
+        <span style="flex: 1; font-size: 15px; color: #E6EDF7;">{{ hoverTitle }}</span>
+      </div>
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #5C7794; margin-top: 6px;">{{ hoverMeta }}</div>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px; border-left: 2px solid rgba(96,165,250,.6); padding-left: 14px;">
+        <sc-for list="{{ hoverParas }}" as="h" hint-placeholder-count="2">
+          <div style="font-size: 14px; line-height: 1.62; color: #C9D8EA; background: {{ h.mark }}; border-radius: 3px;">{{ h.text }}</div>
+        </sc-for>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-top: 16px;">
+        <div style="flex: 1; height: 3px; border-radius: 3px; background: rgba(96,165,250,.16); overflow: hidden;"><div style="height: 100%; width: {{ hoverBar }}%; background: #60A5FA;"></div></div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #6C86A4;">{{ hoverCoverage }}</span>
+      </div>
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: #4C6482; margin-top: 10px;">KLIKK ÅPNER · DRA FLYTTER KILDEN</div>
+    </div>
+  </sc-if>
+
+  <!-- DOKUMENTVISNING MED SAMMENLIGNING -->
+  <sc-if value="{{ docOpen }}">
+    <div onClick="{{ closeDoc }}" style="position: absolute; inset: 0; z-index: 35; background: rgba(2,6,14,.66); backdrop-filter: blur(4px); display: flex; justify-content: flex-end;">
+      <div onClick="{{ stop }}" style="width: {{ sheetWidth }}px; height: 100%; background: #EFEDE6; display: flex; flex-direction: column; box-shadow: -40px 0 90px -30px rgba(0,0,0,.9); animation: evRise .28s ease both;">
+        <div style="height: 60px; flex: 0 0 60px; border-bottom: 1px solid rgba(20,30,45,.14); display: flex; align-items: center; gap: 18px; padding: 0 28px; background: #E6E3DA; color: #1B2430;">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; color: #5A6472;">{{ docCite }}</div>
+          <div style="font-size: 15px; font-weight: 500;">{{ docTitle }}</div>
+          <div style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5A6472;">{{ docPageNote }} · {{ highlightNote }}</div>
+          <div onClick="{{ toggleCompare }}" style="font-size: 13px; border: 1px solid rgba(20,30,45,.22); border-radius: 8px; padding: 7px 13px; cursor: pointer; white-space: nowrap;" style-hover="background: rgba(20,30,45,.08);">⇄ {{ compareLabel }}</div>
+          <div onClick="{{ closeDoc }}" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(20,30,45,.2); display: grid; place-items: center; color: #3A4553; cursor: pointer; font-size: 15px;" style-hover="background: rgba(20,30,45,.08);">✕</div>
+        </div>
+        <div ref="{{ pdfRef }}" onScroll="{{ wake }}" style="flex: 1; min-height: 0; overflow-y: auto; padding: 40px 0 80px; display: flex; justify-content: center; gap: 26px;">
+          <div style="width: {{ paperWidth }}px; flex: 0 0 auto; height: fit-content; background: #FCFBF7; box-shadow: 0 24px 60px -30px rgba(0,0,0,.5); padding: {{ paperPad }}; color: #16202C; font-size: 16.5px; line-height: 1.85;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .18em; color: #7A8492;">{{ docOrg }}</div>
+            <div style="font-family: 'Instrument Serif', serif; font-size: 32px; margin-top: 20px;">{{ docHeading }}</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5A6472; margin-top: 8px;">{{ docMeta }}</div>
+            <div style="height: 1px; background: rgba(20,30,45,.14); margin: 26px 0 28px;"></div>
+            <sc-for list="{{ docParas }}" as="p" hint-placeholder-count="5">
+              <p style="margin: 0 0 22px; background: {{ p.bg }}; box-shadow: {{ p.ring }}; border-radius: 3px; transition: background .3s;">{{ p.text }}<span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .12em; color: #A9762B; opacity: {{ p.tagOp }}; margin-left: 8px;">{{ p.tag }}</span></p>
+            </sc-for>
+            <div style="margin-top: 40px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7A8492;">{{ docFoot }}</div>
+          </div>
+          <sc-if value="{{ compareOn }}">
+            <div style="width: {{ paperWidth }}px; flex: 0 0 auto; height: fit-content; background: #FCFBF7; box-shadow: 0 24px 60px -30px rgba(0,0,0,.5); padding: {{ paperPad }}; color: #16202C; font-size: 16.5px; line-height: 1.85;">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .18em; color: #7A8492;">{{ cmpOrg }}</div>
+              <div style="font-family: 'Instrument Serif', serif; font-size: 32px; margin-top: 20px;">{{ cmpHeading }}</div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5A6472; margin-top: 8px;">{{ cmpMeta }}</div>
+              <div style="height: 1px; background: rgba(20,30,45,.14); margin: 26px 0 28px;"></div>
+              <sc-for list="{{ cmpParas }}" as="p" hint-placeholder-count="4">
+                <p style="margin: 0 0 22px; background: {{ p.bg }}; border-radius: 3px;">{{ p.text }}<span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .12em; color: #A9762B; opacity: {{ p.tagOp }}; margin-left: 8px;">{{ p.tag }}</span></p>
+              </sc-for>
+              <div style="margin-top: 40px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7A8492;">{{ cmpCite }}</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- UTKAST MED LEVENDE FOTNOTER -->
+  <sc-if value="{{ draftOpen }}">
+    <div style="position: absolute; right: 0; top: 82px; bottom: 0; width: 470px; z-index: 30; border-left: 1px solid rgba(96,165,250,.24); background: linear-gradient(180deg, rgba(7,16,31,.97), rgba(3,9,19,.95)); backdrop-filter: blur(22px); display: flex; flex-direction: column; padding: 22px 24px 22px; animation: evRise .25s ease both;">
+      <div style="display: flex; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid rgba(96,165,250,.16);">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .18em; color: #A8C0DA;">UTKAST</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #6EE7C8;">{{ draftLabel }}</span>
+        <div onClick="{{ toggleDraft }}" style="margin-left: auto; color: #8497B0; cursor: pointer; font-size: 15px;" style-hover="color: #DCE8F8;">✕</div>
+      </div>
+      <div style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding: 18px 2px;">
+        <sc-if value="{{ draftEmpty }}">
+          <div style="font-size: 14.5px; line-height: 1.65; color: #6C86A4; border: 1px dashed rgba(96,165,250,.28); border-radius: 12px; padding: 22px;">Tomt. Legg til påstander med ＋ UTKAST i chatten, eller dra en bilagspille hit — kildehenvisningen følger med.</div>
+        </sc-if>
+        <sc-for list="{{ draftItems }}" as="d" hint-placeholder-count="0">
+          <div style="border: 1px solid rgba(96,165,250,.24); border-radius: 12px; background: rgba(11,24,44,.6); padding: 15px 16px; animation: evRise .3s ease both;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7FB3FF;">[{{ d.n }}]</span>
+              <span onClick="{{ d.open }}" style="flex: 1; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .1em; color: #6C86A4; cursor: pointer;" style-hover="color: #BFD6F2;">{{ d.cite }}</span>
+              <span onClick="{{ d.remove }}" style="color: #5C7794; cursor: pointer; font-size: 13px;" style-hover="color: #F0785C;">✕</span>
+            </div>
+            <div style="font-size: 14.5px; line-height: 1.6; color: #DCE8F8; margin-top: 9px;">{{ d.text }}</div>
+            <sc-if value="{{ d.warn }}" hint-placeholder-val="{{ true }}">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .12em; color: #F0B65C; margin-top: 10px;">⚠ {{ d.warnText }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div onClick="{{ goReport }}" style="border: 1px solid rgba(147,197,253,.6); border-radius: 11px; background: linear-gradient(120deg, rgba(30,64,116,.7), rgba(14,32,60,.55)); padding: 15px 18px; text-align: center; font-size: 14.5px; cursor: pointer;" style-hover="border-color: #BFDBFE;">Sett inn i prosesskriv →</div>
+    </div>
+  </sc-if>
+
+  <!-- SLIPPSONER OG DRA-SPØKELSE -->
+  <sc-if value="{{ dragging }}">
+    <div style="position: absolute; left: 0; right: 0; bottom: 34px; z-index: 50; display: flex; justify-content: center; gap: 18px; pointer-events: none;">
+      <div ref="{{ zoneCanvasRef }}" style="width: 300px; border: 1px dashed {{ zoneCanvasBorder }}; border-radius: 14px; background: rgba(7,16,32,.92); padding: 20px 22px; text-align: center;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .16em; color: #7FB3FF;">SLIPP PÅ SAKSLERRETET</div>
+        <div style="font-size: 13.5px; color: #93A9C4; margin-top: 8px;">Kilden blir en node</div>
+      </div>
+      <div ref="{{ zoneDraftRef }}" style="width: 300px; border: 1px dashed {{ zoneDraftBorder }}; border-radius: 14px; background: rgba(7,20,26,.92); padding: 20px 22px; text-align: center;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .16em; color: #6EE7C8;">SLIPP I UTKASTET</div>
+        <div style="font-size: 13.5px; color: #93A9C4; margin-top: 8px;">Blir en påstand med fotnote</div>
+      </div>
+    </div>
+    <div style="position: absolute; left: {{ dragX }}px; top: {{ dragY }}px; z-index: 55; transform: translate(-50%,-140%); pointer-events: none; display: flex; align-items: center; gap: 9px; border: 1px solid rgba(147,197,253,.8); background: rgba(12,28,52,.95); border-radius: 999px; padding: 9px 16px; box-shadow: 0 18px 40px -16px rgba(0,0,0,.9);">
+      <span style="color: #7FB3FF; font-size: 13px;">▤</span>
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #DCE8F8;">{{ dragLabel }}</span>
+    </div>
+  </sc-if>
+
+  <!-- CMD+K -->
+  <sc-if value="{{ paletteOpen }}">
+    <div onClick="{{ closePalette }}" style="position: absolute; inset: 0; background: rgba(2,6,14,.72); backdrop-filter: blur(6px); display: flex; justify-content: center; padding-top: 180px; z-index: 40;">
+      <div onClick="{{ stop }}" style="width: 720px; border-radius: 16px; border: 1px solid rgba(147,197,253,.45); background: rgba(7,16,32,.96); box-shadow: 0 40px 100px -30px rgba(0,0,0,.95); overflow: hidden; height: fit-content;">
+        <div style="display: flex; align-items: center; gap: 14px; padding: 20px 24px; border-bottom: 1px solid rgba(96,165,250,.16);">
+          <span style="color: #60A5FA; font-size: 16px;">⌕</span>
+          <input ref="{{ paletteRef }}" value="{{ paletteQuery }}" onChange="{{ onPaletteInput }}" placeholder="Søk i saken, hopp til bilag, kjør analyse…" style="flex: 1; background: transparent; border: none; outline: none; color: #E6EDF7; font-family: Geist, sans-serif; font-size: 17px;" />
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #5C7794;">ESC</span>
+        </div>
+        <sc-if value="{{ hasSel }}">
+          <div style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 24px; background: rgba(9,30,30,.55); border-bottom: 1px solid rgba(37,208,166,.25);">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; color: #6EE7C8; padding-top: 3px;">MARKERT</span>
+            <span style="flex: 1; font-size: 14px; line-height: 1.5; color: #C9D8EA;">{{ selPreview }}</span>
+          </div>
+        </sc-if>
+        <div style="max-height: 420px; overflow-y: auto; padding: 10px;">
+          <sc-for list="{{ paletteResults }}" as="r" hint-placeholder-count="5">
+            <div onClick="{{ r.run }}" style="display: flex; align-items: center; gap: 14px; padding: 13px 15px; border-radius: 10px; cursor: pointer;" style-hover="background: rgba(96,165,250,.12);">
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .12em; color: {{ r.tint }}; width: 88px;">{{ r.group }}</span>
+              <span style="flex: 1; font-size: 15px;">{{ r.label }}</span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #5C7794;">{{ r.hint }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080},&quot;showParticles&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Bevegelse&quot;},&quot;nodeCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:40,&quot;min&quot;:12,&quot;max&quot;:40,&quot;step&quot;:2,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Sakslerretet&quot;}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'home', soon: null,
+    uploadPhase: 'idle', uploadTick: 0,
+    summary: false, aiTyping: false,
+    layout: 'organic', selected: null,
+    palette: false, query: '',
+    zoom: 1, origin: '50% 50%', hover: null, diving: null,
+    extraEdges: [], extraNodes: [], ripples: [],
+    sound: true, dim: false, selText: '',
+    warHi: null, warTyping: false, warExtra: [], openDoc: null, hoverPill: null,
+    compareDoc: null, conflictResolved: null, draft: [], draftOpen: false,
+    drag: null, dragPos: null, dropZone: null, focusIdx: -1, exported: false,
+    boxes: null, links: null, linkType: 'beviser', dragBox: null, wire: null,
+    caseChat: [{ who: 'ai', text: 'Jeg har lest alle 12 bilagene — 486 sider og 1 204 avsnitt. Alt er indeksert og sporbart tilbake til kilden. Hva vil du starte med?', conf: 'bekreftet', confN: 12, pills: 'ALL' }]
+  };
+
+  BILAG = [
+    { cite: 'Bilag 1', kind: 'POLITIRAPPORT', title: 'Politirapport — trafikkulykke Storgata', meta: '14.03.2023 · 8 sider' },
+    { cite: 'Bilag 2', kind: 'VITNEFORKLARING', title: 'Øyevitneforklaring — Lars Holm', meta: '16.03.2023 · 6 sider' },
+    { cite: 'Bilag 3', kind: 'VITNEFORKLARING', title: 'Øyevitneforklaring — Ingrid Berg', meta: '17.03.2023 · 4 sider' },
+    { cite: 'Bilag 4', kind: 'LEGEERKLÆRING', title: 'Legeerklæring — Haukeland universitetssjukehus', meta: '20.03.2023 · 3 sider' },
+    { cite: 'Bilag 5', kind: 'E-POSTLOGG', title: 'E-postlogg — Gjensidige Forsikring', meta: '18.04–22.09.2023 · 41 sider' },
+    { cite: 'Bilag 6', kind: 'RAPPORT', title: 'Skadetakst sykkel — Bergen Bilservice', meta: '29.03.2023 · 2 sider' },
+    { cite: 'Bilag 7', kind: 'SKJEMA', title: 'Skademelding motorvogn', meta: '15.03.2023 · 2 sider' },
+    { cite: 'Bilag 8', kind: 'SYKEMELDING', title: 'Sykemelding 100 % — 12 uker', meta: '20.03.2023 · 1 side' },
+    { cite: 'Bilag 9', kind: 'FOTO', title: 'Fotodokumentasjon fra ulykkesstedet', meta: '14.03.2023 · 14 filer' },
+    { cite: 'Bilag 10', kind: 'AVTALEUTKAST', title: 'Forliksutkast fra motpartens forsikring', meta: '22.09.2023 · 5 sider' },
+    { cite: 'Bilag 11', kind: 'AVHØR', title: 'Avhør — politibetjent T. Rustad', meta: '02.04.2023 · 7 sider' },
+    { cite: 'Bilag 12', kind: 'ØKONOMI', title: 'Oppstilling av økonomisk tap og kvitteringer', meta: '01.10.2023 · 19 sider' }
+  ];
+
+  FILES = [
+    { name: 'Politirapport_23-041755.pdf', size: '4,2 MB' },
+    { name: 'Vitneforklaring_Holm.pdf', size: '1,8 MB' },
+    { name: 'Vitneforklaring_Berg.pdf', size: '1,1 MB' },
+    { name: 'Legeerklæring_Haukeland.pdf', size: '0,9 MB' },
+    { name: 'Epostlogg_Gjensidige.eml', size: '12,4 MB' },
+    { name: 'Skadetakst_sykkel.pdf', size: '2,3 MB' },
+    { name: 'Sykemelding_12uker.pdf', size: '0,3 MB' },
+    { name: 'Tapsoppstilling.xlsx', size: '1,6 MB' }
+  ];
+
+  NODES = [
+    { kind: 'SOURCEUNIT', title: 'Politirapport s. 3', cite: 'Bilag 1, s. 3', snippet: 'Fører av personbil svingte til høyre i krysset Storgata/Nygårdsgaten uten å gi tegn. Syklist kom i sykkelfelt fra samme retning.', cluster: 0 },
+    { kind: 'FAKTUM', title: 'Bil krysset sykkelfelt', cite: 'Bilag 1, s. 3', snippet: 'Nedtegnet av tjenestemann på stedet: bilen befant seg delvis i sykkelfeltet ved sammenstøtet.', cluster: 0 },
+    { kind: 'AKTØR', title: 'Peder Ås — bilfører', cite: 'Bilag 7', snippet: 'Registrert som fører av personbil EK 41 209 på ulykkestidspunktet.', cluster: 0 },
+    { kind: 'AKTØR', title: 'Marte Kirkerud — syklist', cite: 'Bilag 1, s. 1', snippet: 'Skadelidt. Ansatt i Bergen kommune, syklet til arbeid da sammenstøtet skjedde.', cluster: 0 },
+    { kind: 'SOURCEUNIT', title: 'Vitneforklaring Holm s. 4', cite: 'Bilag 2, s. 4', snippet: 'Jeg så på klokka rett etterpå. Den var 07:45. Bilen svingte utan å blinke, og sykkelen rakk ikkje å bremse.', cluster: 1 },
+    { kind: 'FAKTUM', title: 'Tidspunkt 07:45', cite: 'Bilag 2, s. 4', snippet: 'Vitne Holm oppgir presist klokkeslett 07:45, bekreftet mot eget oppmøteregister.', cluster: 1 },
+    { kind: 'AKTØR', title: 'Lars Holm — øyevitne', cite: 'Bilag 2, s. 1', snippet: 'Sto på fortauet ca. 8 meter fra krysset. Ingen tilknytning til partene.', cluster: 1 },
+    { kind: 'SOURCEUNIT', title: 'Vitneforklaring Berg s. 2', cite: 'Bilag 3, s. 2', snippet: 'Det var rundt åtte, tror jeg. Jeg satt i bilen bak og så at sykkelen gikk i bakken.', cluster: 1 },
+    { kind: 'FAKTUM', title: 'Tidspunkt «rundt åtte»', cite: 'Bilag 3, s. 2', snippet: 'Vitne Berg angir tidspunkt upresist. Ingen uavhengig bekreftelse.', cluster: 1 },
+    { kind: 'AKTØR', title: 'Ingrid Berg — øyevitne', cite: 'Bilag 3, s. 1', snippet: 'Satt i bil to kjøretøy bak. Så hendelsen gjennom frontruta.', cluster: 1 },
+    { kind: 'SOURCEUNIT', title: 'Legeerklæring s. 1', cite: 'Bilag 4, s. 1', snippet: 'Tverrgående brudd i høyre patella samt lett hjernerystelse. Funnene er forenlige med angitt hendelsesforløp.', cluster: 2 },
+    { kind: 'FAKTUM', title: 'Bruddskade høyre kne', cite: 'Bilag 4, s. 1', snippet: 'Diagnose S82.0. Operert 15.03.2023, kontroll etter seks uker.', cluster: 2 },
+    { kind: 'FAKTUM', title: 'Hjernerystelse', cite: 'Bilag 4, s. 2', snippet: 'Commotio cerebri. Observasjon ett døgn ved Haukeland.', cluster: 2 },
+    { kind: 'SOURCEUNIT', title: 'Sykemelding 12 uker', cite: 'Bilag 8', snippet: '100 % sykemeldt fra 14.03.2023 til 06.06.2023. Forlenget én gang.', cluster: 2 },
+    { kind: 'FAKTUM', title: 'Inntektstap 12 uker', cite: 'Bilag 12, s. 3', snippet: 'Dokumentert bruttotap kr 186 400 i sykemeldingsperioden, fratrukket sykepenger.', cluster: 2 },
+    { kind: 'SOURCEUNIT', title: 'E-post 22.09.2023', cite: 'Bilag 5, s. 31', snippet: 'Vi erkjenner ansvar for hendelsen, men bestrider omfanget av det oppgitte inntektstapet.', cluster: 3 },
+    { kind: 'FAKTUM', title: 'Ansvar erkjent', cite: 'Bilag 5, s. 31', snippet: 'Forsikringsselskapet erkjenner ansvarsgrunnlaget skriftlig 22.09.2023.', cluster: 3 },
+    { kind: 'FAKTUM', title: 'Omfang bestridt', cite: 'Bilag 5, s. 33', snippet: 'Selskapet mener deler av inntektstapet skyldes forhold uten sammenheng med skaden.', cluster: 3 },
+    { kind: 'SOURCEUNIT', title: 'Forliksutkast s. 2', cite: 'Bilag 10, s. 2', snippet: 'Tilbud om oppgjør kr 240 000 mot full og endelig kvittering.', cluster: 3 },
+    { kind: 'FAKTUM', title: 'Tilbud kr 240 000', cite: 'Bilag 10, s. 2', snippet: 'Tilbudet dekker ikke fremtidig behandlingsutgift eller sykkel.', cluster: 3 },
+    { kind: 'FAKTUM', title: 'Krav kr 418 500', cite: 'Bilag 12, s. 1', snippet: 'Samlet krav: inntektstap, egenandeler, sykkel og fremtidig fysioterapi.', cluster: 3 },
+    { kind: 'AKTØR', title: 'Gjensidige Forsikring', cite: 'Bilag 5', snippet: 'Motpartens ansvarsforsikring. Saksbehandler H. Lie.', cluster: 3 },
+    { kind: 'SOURCEUNIT', title: 'Skadetakst sykkel', cite: 'Bilag 6', snippet: 'Ramme og forgaffel kondemnert. Gjenanskaffelsesverdi kr 31 900.', cluster: 4 },
+    { kind: 'FAKTUM', title: 'Sykkel kondemnert', cite: 'Bilag 6, s. 2', snippet: 'Verkstedet vurderer reparasjon som ulønnsom.', cluster: 4 },
+    { kind: 'SOURCEUNIT', title: 'Foto 04 — bremsespor', cite: 'Bilag 9, foto 4', snippet: 'Bremsespor i sykkelfeltet, lengde ca. 3,4 meter, fotografert kl. 08:20.', cluster: 4 },
+    { kind: 'FAKTUM', title: 'Bremsespor 3,4 m', cite: 'Bilag 9, foto 4', snippet: 'Sporet støtter at syklist forsøkte å bremse før sammenstøtet.', cluster: 4 },
+    { kind: 'SOURCEUNIT', title: 'Avhør Rustad s. 5', cite: 'Bilag 11, s. 5', snippet: 'Tjenestemann bekrefter at melding kom inn kl. 07:52 og at han var på stedet 07:59.', cluster: 1 },
+    { kind: 'FAKTUM', title: 'Melding kl. 07:52', cite: 'Bilag 11, s. 5', snippet: 'Operasjonsloggen viser innringing 07:52 — støtter Holms tidsangivelse.', cluster: 1 },
+    { kind: 'SOURCEUNIT', title: 'Skademelding s. 1', cite: 'Bilag 7, s. 1', snippet: 'Fører har krysset av for «annen part i sykkelfelt» og angitt tidspunkt ca. 07:45.', cluster: 1 },
+    { kind: 'FAKTUM', title: 'Fører angir 07:45', cite: 'Bilag 7, s. 1', snippet: 'Motpartens egen skademelding angir samme tidspunkt som vitne Holm.', cluster: 1 },
+    { kind: 'FAKTUM', title: 'Klart vær, tørr veibane', cite: 'Bilag 1, s. 2', snippet: 'Meteorologiske forhold utelukker glatt vei som medvirkende årsak.', cluster: 0 },
+    { kind: 'FAKTUM', title: 'Ingen tegn gitt', cite: 'Bilag 2, s. 4', snippet: 'To vitner og motpartens egen melding beskriver høyresving uten blinklys.', cluster: 0 },
+    { kind: 'SOURCEUNIT', title: 'Kvittering fysioterapi', cite: 'Bilag 12, s. 11', snippet: '18 behandlinger, egenandel kr 8 640 samlet.', cluster: 4 },
+    { kind: 'FAKTUM', title: 'Egenandeler kr 8 640', cite: 'Bilag 12, s. 11', snippet: 'Dokumenterte utgifter til fysioterapi i perioden april–august 2023.', cluster: 4 },
+    { kind: 'FAKTUM', title: 'Fremtidig behandling', cite: 'Bilag 4, s. 3', snippet: 'Lege anbefaler videre oppfølging i minst tolv måneder.', cluster: 4 },
+    { kind: 'SOURCEUNIT', title: 'E-post 18.04.2023', cite: 'Bilag 5, s. 4', snippet: 'Første henvendelse til selskapet med krav om dekning.', cluster: 3 },
+    { kind: 'FAKTUM', title: 'Krav fremsatt 18.04', cite: 'Bilag 5, s. 4', snippet: 'Fristavbrudd dokumentert. Ingen foreldelsesproblematikk.', cluster: 3 },
+    { kind: 'FAKTUM', title: 'Uaktsomhet', cite: 'Bilag 1, s. 3', snippet: 'Samlet vurdering: fører har opptrådt uaktsomt ved høyresving over sykkelfelt.', cluster: 0 },
+    { kind: 'FAKTUM', title: 'Årsakssammenheng', cite: 'Bilag 4, s. 1', snippet: 'Medisinsk dokumentasjon knytter skaden til hendelsen 14.03.2023.', cluster: 2 },
+    { kind: 'FAKTUM', title: 'Ingen medvirkning', cite: 'Bilag 9, foto 4', snippet: 'Ingen holdepunkter for at syklist medvirket til skaden.', cluster: 2 }
+  ];
+
+  EDGE_SPEC = [
+    [0, 1, 'BEVISER'], [1, 37, 'BEVISER'], [2, 1, 'REFERERER TIL'], [3, 0, 'REFERERER TIL'],
+    [4, 5, 'BEVISER'], [6, 4, 'REFERERER TIL'], [7, 8, 'BEVISER'], [9, 7, 'REFERERER TIL'],
+    [5, 8, 'MOTSIER'], [26, 27, 'BEVISER'], [27, 5, 'BEVISER'], [28, 29, 'BEVISER'],
+    [29, 5, 'BEVISER'], [29, 8, 'MOTSIER'], [10, 11, 'BEVISER'], [10, 12, 'BEVISER'],
+    [11, 38, 'BEVISER'], [13, 14, 'BEVISER'], [14, 20, 'REFERERER TIL'], [15, 16, 'BEVISER'],
+    [15, 17, 'BEVISER'], [17, 20, 'MOTSIER'], [18, 19, 'BEVISER'], [19, 20, 'MOTSIER'],
+    [21, 15, 'REFERERER TIL'], [22, 23, 'BEVISER'], [23, 20, 'REFERERER TIL'],
+    [24, 25, 'BEVISER'], [25, 39, 'BEVISER'], [30, 37, 'BEVISER'], [31, 37, 'BEVISER'],
+    [32, 33, 'BEVISER'], [33, 20, 'REFERERER TIL'], [34, 20, 'REFERERER TIL'],
+    [35, 36, 'BEVISER'], [1, 31, 'REFERERER TIL'], [12, 38, 'BEVISER'], [39, 37, 'BEVISER'],
+    [16, 37, 'REFERERER TIL'], [14, 17, 'MOTSIER']
+  ];
+
+  PDF = [
+    { text: 'Eg var på veg til arbeid og stod på fortauet på austsida av Storgata, om lag åtte meter frå krysset ved Nygårdsgaten. Eg hugsar at det var klart vêr og tørr asfalt.' },
+    { text: 'Ein mørk personbil kom sørover i same retning som syklisten. Bilen låg i høgre køyrefelt og heldt vanleg fart for gata.', hi: 'car' },
+    { text: 'Då bilen kom til krysset, svinga han til høgre inn i Nygårdsgaten. Han gav ikkje teikn, og eg såg ikkje bremselys før etter samanstøytet.', hi: 'car' },
+    { text: 'Syklisten kom i sykkelfeltet på høgre side av bilen. Ho rakk ikkje å bremse nok, og framhjulet trefte bilen sin høgre framdør. Ho fall over styret og landa på høgre side.' },
+    { text: 'Eg såg på klokka rett etterpå, fordi eg skulle rekke eit møte. Den var 07:45. Eg er sikker på tidspunktet.', hi: 'time' },
+    { text: 'Eg gjekk bort til syklisten. Ho var vaken, men klaga over sterke smerter i høgre kne og verka forvirra. Ein annan person ringde 113.' },
+    { text: 'Bilføraren stoppa om lag tjue meter framme og kom tilbake til staden. Han sa at han ikkje hadde sett sykkelen.' },
+    { text: 'Politiet kom kort tid etter. Eg gav namn og telefonnummer til tjenestemannen på staden og forklarte meg same dag.' }
+  ];
+
+  DOCS = {
+    b1: {
+      cite: 'Bilag 1', title: 'Politirapport — trafikkulykke Storgata', org: 'POLITIET · VEST POLITIDISTRIKT · SAK 23-041755',
+      meta: 'Nedtegnet 14.03.2023 av politibetjent T. Rustad', pages: 8, page: 3, foot: 'SIDE 3 AV 8 · VEST POLITIDISTRIKT',
+      paras: [
+        { text: 'Melding om trafikkuhell med personskade mottatt kl. 07:52. Patrulje fremme på stedet kl. 07:59. Krysset Storgata/Nygårdsgaten var da delvis sperret av vitner.' },
+        { text: 'Personbil, reg. EK 41 209, ført av Peder Ås, f. 1981, hadde svingt til høyre fra Storgata inn i Nygårdsgaten. Syklist kom i sykkelfelt på høyre side i samme retning.', hi: 'car' },
+        { text: 'Bilen befant seg delvis i sykkelfeltet ved sammenstøtet. Det er ikke observert bremsespor etter kjøretøyet før kollisjonspunktet.', hi: 'car' },
+        { text: 'Værforhold: klart, tørr veibane, god sikt. Gatelys tent. Ingen holdepunkter for at føreforholdene har medvirket.' },
+        { text: 'Samlet vurdering på stedet: fører synes å ha opptrådt uaktsomt ved høyresving over sykkelfelt uten å forvisse seg om at feltet var fritt.' }
+      ]
+    },
+    b2: {
+      cite: 'Bilag 2', title: 'Øyevitneforklaring — Lars Holm', org: 'POLITIET · VEST POLITIDISTRIKT · SAK 23-041755',
+      meta: 'Lars Holm, f. 1978 — avgitt 16.03.2023, kl. 11:20', pages: 6, page: 4, foot: 'SIDE 4 AV 6 · SIGNERT L. HOLM · POLITIBETJENT T. RUSTAD',
+      docTitle: 'Vitneforklaring', paras: null
+    },
+    b3: {
+      cite: 'Bilag 3', title: 'Øyevitneforklaring — Ingrid Berg', org: 'POLITIET · VEST POLITIDISTRIKT · SAK 23-041755',
+      meta: 'Ingrid Berg, f. 1990 — avgitt 17.03.2023, kl. 14:05', pages: 4, page: 2, foot: 'SIDE 2 AV 4 · SIGNERT I. BERG',
+      docTitle: 'Vitneforklaring',
+      paras: [
+        { text: 'Eg sat i bilen min, to bilar bak den mørke personbilen. Vi køyrde sakte sørover i Storgata på veg mot arbeid.' },
+        { text: 'Eg såg at bilen framfor svinga til høgre. Så gjekk sykkelen i bakken. Eg såg ikkje sjølve samanstøytet, berre at syklisten fall.' },
+        { text: 'Det var rundt åtte, trur eg. Eg hadde ikkje sett på klokka, men eg plar passere krysset i den tida.', hi: 'time' },
+        { text: 'Eg stoppa ikkje sjølv, men såg at fleire gjekk bort til syklisten. Ein mann på fortauet var først framme.' }
+      ]
+    },
+    b4: {
+      cite: 'Bilag 4', title: 'Legeerklæring — Haukeland universitetssjukehus', org: 'HAUKELAND UNIVERSITETSSJUKEHUS · ORTOPEDISK AVDELING',
+      meta: 'Utstedt 20.03.2023 av overlege M. Sandvik', pages: 3, page: 1, foot: 'SIDE 1 AV 3 · JOURNALNR. 44-2023-1187', docTitle: 'Legeerklæring',
+      paras: [
+        { text: 'Pasienten ble innbrakt med ambulanse 14.03.2023 etter sammenstøt mellom sykkel og personbil i Storgata.' },
+        { text: 'Klinisk og radiologisk påvist tverrgående brudd i høyre patella (S82.0) samt lett hjernerystelse (commotio cerebri).', hi: 'med' },
+        { text: 'Funnene er forenlige med det angitte hendelsesforløpet. Operert 15.03.2023. Observasjon ett døgn grunnet hodeskade.' },
+        { text: 'Det anbefales videre oppfølging med fysioterapi i minst tolv måneder. Full arbeidsuførhet forventes i tolv uker.' }
+      ]
+    },
+    b5: {
+      cite: 'Bilag 5', title: 'E-post fra Gjensidige Forsikring', org: 'E-POSTLOGG · GJENSIDIGE FORSIKRING ASA',
+      meta: 'Fra: H. Lie, saksbehandler — 22.09.2023, kl. 09:14', pages: 41, page: 31, foot: 'SIDE 31 AV 41 · EKSPORTERT FRA E-POSTLOGG', docTitle: 'Vedrørende sak 23-041755',
+      paras: [
+        { text: 'Vi viser til Deres henvendelse av 18.04.2023 og til etterfølgende korrespondanse i saken.' },
+        { text: 'Selskapet erkjenner ansvar for hendelsen 14.03.2023, men bestrider omfanget av det oppgitte inntektstapet.', hi: 'ansvar' },
+        { text: 'Vi kan ikke se at hele sykemeldingsperioden på tolv uker er tilstrekkelig dokumentert som følge av skaden.' },
+        { text: 'Som et forlik tilbys kr 240 000 mot full og endelig kvittering. Tilbudet står ved lag i seks uker.' }
+      ]
+    },
+    b8: {
+      cite: 'Bilag 8', title: 'Sykemelding 100 % — 12 uker', org: 'NAV · SYKMELDING DEL C',
+      meta: 'Utstedt 20.03.2023 av fastlege K. Nordbø', pages: 1, page: 1, foot: 'SIDE 1 AV 1 · DIAGNOSE L76 / S82.0', docTitle: 'Sykmelding',
+      paras: [
+        { text: '100 % sykmeldt i perioden 14.03.2023 til 06.06.2023. Forlenget én gang etter kontroll 02.05.2023.' },
+        { text: 'Begrunnelse: postoperativ opptrening etter patellabrudd, samt vedvarende hodepine etter commotio.' },
+        { text: 'Pasienten arbeider som saksbehandler i Bergen kommune og har ikke kunnet møte fysisk eller arbeide fra hjemmekontor i perioden.' }
+      ]
+    },
+    b11: {
+      cite: 'Bilag 11', title: 'Avhør — politibetjent T. Rustad', org: 'POLITIET · VEST POLITIDISTRIKT · SAK 23-041755',
+      meta: 'Avhør avgitt 02.04.2023, kl. 10:00', pages: 7, page: 5, foot: 'SIDE 5 AV 7 · SIGNERT T. RUSTAD', docTitle: 'Avhørsrapport',
+      paras: [
+        { text: 'Tjenestemannen forklarer at melding om uhellet kom inn til operasjonssentralen kl. 07:52.' },
+        { text: 'Patruljen var på stedet kl. 07:59. Tidsangivelsene er hentet fra operasjonsloggen og kan verifiseres.', hi: 'time' },
+        { text: 'Ved ankomst var syklisten fortsatt på bakken. To vitner oppga navn og telefonnummer på stedet.' },
+        { text: 'Fører av personbilen forklarte at han ikke hadde sett sykkelen før sammenstøtet.' }
+      ]
+    },
+    b7: {
+      cite: 'Bilag 7', title: 'Skademelding motorvogn', org: 'STANDARD SKADEMELDING · UTFYLT AV FØRER',
+      meta: 'Utfylt 15.03.2023 av Peder Ås', pages: 2, page: 1, foot: 'SIDE 1 AV 2 · SIGNERT P. ÅS', docTitle: 'Skademelding',
+      paras: [
+        { text: 'Punkt 4 — Tidspunkt for skaden: ca. kl. 07:45. Sted: krysset Storgata/Nygårdsgaten, Bergen.', hi: 'time' },
+        { text: 'Punkt 9 — Avkryssing: «annen part i sykkelfelt». Fører har krysset av for at han svingte til høyre.', hi: 'car' },
+        { text: 'Punkt 14 — Merknader fra fører: «Så ikke syklisten før det smalt. Sikten var god.»' }
+      ]
+    },
+    b12: {
+      cite: 'Bilag 12', title: 'Oppstilling av økonomisk tap', org: 'ADVOKATFIRMAET NORDVIK · TAPSOPPSTILLING',
+      meta: 'Utarbeidet 01.10.2023 · vedlagt 34 kvitteringer', pages: 19, page: 1, foot: 'SIDE 1 AV 19 · SAK-2023-0417', docTitle: 'Samlet krav',
+      paras: [
+        { text: 'Post 1 — Inntektstap i sykemeldingsperioden, brutto kr 186 400 fratrukket sykepenger.', hi: 'okonomi' },
+        { text: 'Post 2 — Egenandeler fysioterapi, 18 behandlinger, kr 8 640.' },
+        { text: 'Post 3 — Sykkel kondemnert, gjenanskaffelsesverdi kr 31 900, jf. Bilag 6.' },
+        { text: 'Post 4 — Fremtidig behandling og menerstatning, beregnet kr 191 560.' },
+        { text: 'Samlet krav: kr 418 500. Motpartens tilbud utgjør 57 % av kravet.', hi: 'okonomi' }
+      ]
+    }
+  };
+
+  BOX_W = 250; BOX_H = 112;
+  LINK_TYPES = [
+    { id: 'beviser', label: 'BEVISER', color: '#25D0A6', dash: 'none', fn: 'Styrker mottakeren — to bevis gjør boksen bekreftet' },
+    { id: 'motsier', label: 'MOTSIER', color: '#F0785C', dash: '6 5', fn: 'Merker begge bokser til avklaring' },
+    { id: 'referer', label: 'REFERERER TIL', color: '#60A5FA', dash: 'none', fn: 'Nøytral kobling — teller som henvisning' },
+    { id: 'folger', label: 'FØLGER AV', color: '#B58CF0', dash: 'none', fn: 'Setter rekkefølge — boksene nummereres' },
+    { id: 'usikker', label: 'USIKKER', color: '#F0B65C', dash: '2 6', fn: 'Markerer mottakeren som usikker' }
+  ];
+  BOXES0 = [
+    { id: 0, kind: 'SOURCEUNIT', title: 'Politirapport s. 3', cite: 'Bilag 1', x: 90, y: 150 },
+    { id: 1, kind: 'VITNE', title: 'Forklaring — Lars Holm', cite: 'Bilag 2, s. 4', x: 430, y: 150 },
+    { id: 2, kind: 'VITNE', title: 'Forklaring — Ingrid Berg', cite: 'Bilag 3, s. 2', x: 430, y: 330 },
+    { id: 3, kind: 'FAKTUM', title: 'Tidspunkt 07:45', cite: 'Bilag 7, s. 1', x: 800, y: 200 },
+    { id: 4, kind: 'MEDISIN', title: 'Legeerklæring — patellabrudd', cite: 'Bilag 4, s. 1', x: 800, y: 430 },
+    { id: 5, kind: 'AKTØR', title: 'Avhør — betjent Rustad', cite: 'Bilag 11, s. 5', x: 90, y: 430 },
+    { id: 6, kind: 'MOTPART', title: 'Ansvar erkjent 22.09', cite: 'Bilag 5, s. 31', x: 1170, y: 150 },
+    { id: 7, kind: 'ØKONOMI', title: 'Samlet krav kr 418 500', cite: 'Bilag 12, s. 1', x: 1170, y: 400 }
+  ];
+  LINKS0 = [{ from: 0, to: 3, type: 'beviser' }, { from: 1, to: 3, type: 'beviser' }, { from: 2, to: 3, type: 'motsier' }];
+
+  boardHost = el => { this._board = el; };
+  boardK() { const r = this._board && this._board.getBoundingClientRect(); return r ? (r.width / 1652) || 1 : 1; }
+  boardPt(ev) {
+    const r = this._board.getBoundingClientRect(), k = this.boardK();
+    return { x: (ev.clientX - r.left) / k, y: (ev.clientY - r.top) / k };
+  }
+  // verktøylinjene eier disse sonene — boksene skyves ut av dem
+  RESERVED = [
+    { x1: 0, y1: 0, x2: 790, y2: 116, push: 'down' },
+    { x1: 1140, y1: 0, x2: 1652, y2: 80, push: 'down' },
+    { x1: 0, y1: 926, x2: 800, y2: 998, push: 'up' }
+  ];
+  clampBox(x, y) {
+    const W = this.BOX_W, H = this.BOX_H;
+    x = Math.max(8, Math.min(1652 - W - 8, x));
+    y = Math.max(8, Math.min(998 - H - 8, y));
+    this.RESERVED.forEach(r => {
+      if (x < r.x2 && x + W > r.x1 && y < r.y2 && y + H > r.y1) y = r.push === 'down' ? r.y2 + 8 : r.y1 - H - 8;
+    });
+    return { x, y: Math.max(8, Math.min(998 - H - 8, y)) };
+  }
+
+  startBoxDrag = (id) => (e) => {
+    if (e.button !== 0 || !this._board) return;
+    e.preventDefault();
+    const p = this.boardPt(e), list = this.state.boxes || this.BOXES0.map(x => ({ ...x })), b = list.find(x => x.id === id);
+    if (!b) return;
+    const off = { x: p.x - b.x, y: p.y - b.y };
+    this.setState({ dragBox: id });
+    const move = (ev) => {
+      const q = this.boardPt(ev);
+      const p2 = this.clampBox(Math.round((q.x - off.x) / 8) * 8, Math.round((q.y - off.y) / 8) * 8);
+      this.setState({ boxes: (this.state.boxes || list).map(x => x.id === id ? { ...x, x: p2.x, y: p2.y } : x) });
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up);
+      this.setState({ dragBox: null }); this.snap();
+    };
+    window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+  };
+  startWire = (id) => (e) => {
+    if (e.button !== 0 || !this._board) return;
+    e.preventDefault(); e.stopPropagation();
+    const p = this.boardPt(e);
+    this.setState({ wire: { from: id, x: p.x, y: p.y } });
+    const move = (ev) => { const q = this.boardPt(ev); this.setState({ wire: { from: id, x: q.x, y: q.y } }); };
+    const up = (ev) => {
+      window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up);
+      const q = this.boardPt(ev);
+      const hit = (this.state.boxes || this.BOXES0).find(b => b.id !== id && q.x >= b.x && q.x <= b.x + this.BOX_W && q.y >= b.y && q.y <= b.y + this.BOX_H);
+      this.setState({ wire: null });
+      if (hit) {
+        const t = this.state.linkType;
+        this.setState({ links: (this.state.links || this.LINKS0).concat([{ from: id, to: hit.id, type: t }]) });
+        this.snap();
+        this.ripple(((hit.x + this.BOX_W / 2) / 1652) * 100, ((hit.y + this.BOX_H / 2) / 998) * 100);
+      }
+    };
+    window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+  };
+  setLinkType = (id) => () => this.setState({ linkType: id });
+  dropLink = (i) => (e) => { if (e) e.stopPropagation(); this.setState({ links: (this.state.links || this.LINKS0).filter((_, j) => j !== i) }); };
+  clearBoard = () => this.setState({ boxes: this.BOXES0.map(b => ({ ...b })), links: this.LINKS0.map(l => ({ ...l })) });
+  resolveBoardConflict = () => { this.thump(); this.setState({ links: (this.state.links || this.LINKS0).map(l => l.type === 'motsier' ? { ...l, resolved: true } : l) }); };
+
+  REPORT_POINTS = [
+    { text: 'Fører av personbil EK 41 209 svingte 14. mars 2023 til høyre over sykkelfeltet i krysset Storgata/Nygårdsgaten uten å gi tegn. Handlingen er uaktsom.', cite: 'Bilag 1, s. 3; Bilag 2, s. 4; Bilag 7, s. 1', conf: 'BEKREFTET · 3 KILDER', color: '#1F7A63' },
+    { text: 'Skadelidte pådro seg tverrgående brudd i høyre patella samt lett hjernerystelse. Skadene er medisinsk knyttet til hendelsen.', cite: 'Bilag 4, s. 1; Bilag 8', conf: 'BEKREFTET · 2 KILDER', color: '#1F7A63' },
+    { text: 'Motpartens forsikringsselskap erkjente ansvar 22. september 2023, men bestrider omfanget av inntektstapet.', cite: 'Bilag 5, s. 31', conf: 'BESTRIDT AV MOTPART', color: '#A9762B' },
+    { text: 'Samlet erstatningskrav utgjør kr 418 500, hvorav kr 186 400 er dokumentert inntektstap i sykemeldingsperioden.', cite: 'Bilag 12, s. 1', conf: 'ÉN KILDE', color: '#5A6472' }
+  ];
+  REPORT_ROWS = [
+    { faktum: 'Høyresving over sykkelfelt uten tegn', kilde: 'Bilag 1, 2, 7', styrke: 'Sterk', color: '#1F7A63' },
+    { faktum: 'Tidspunkt 07:45', kilde: 'Bilag 2, 7, 11', styrke: 'Sterk', color: '#1F7A63' },
+    { faktum: 'Bruddskade høyre kne', kilde: 'Bilag 4', styrke: 'Sterk', color: '#1F7A63' },
+    { faktum: 'Inntektstap tolv uker', kilde: 'Bilag 8, 12', styrke: 'Middels', color: '#A9762B' },
+    { faktum: 'Fremtidig behandlingsbehov', kilde: 'Bilag 4, s. 3', styrke: 'Svak', color: '#8A5A2B' }
+  ];
+  CHRONO = [
+    { date: '14.03.2023', text: 'Sammenstøt i krysset Storgata/Nygårdsgaten kl. 07:45. Melding til politiet kl. 07:52.', cite: 'Bilag 1, 2, 11' },
+    { date: '15.03.2023', text: 'Operasjon av patellabrudd ved Haukeland. Skademelding utfylt av fører.', cite: 'Bilag 4, 7' },
+    { date: '20.03.2023', text: 'Legeerklæring og sykmelding 100 % i tolv uker.', cite: 'Bilag 4, 8' },
+    { date: '18.04.2023', text: 'Krav fremsatt overfor Gjensidige Forsikring.', cite: 'Bilag 5, s. 4' },
+    { date: '22.09.2023', text: 'Ansvar erkjent, omfang bestridt. Forlik tilbudt med kr 240 000.', cite: 'Bilag 5, s. 31; Bilag 10' },
+    { date: '01.10.2023', text: 'Tapsoppstilling utarbeidet. Samlet krav kr 418 500.', cite: 'Bilag 12' }
+  ];
+
+  DATE_BY_BILAG = { 1: '14.03', 2: '16.03', 3: '17.03', 4: '20.03', 5: '22.09', 6: '29.03', 7: '15.03', 8: '20.03', 9: '14.03', 10: '22.09', 11: '02.04', 12: '01.10' };
+  BUCKETS = ['14.03', '15.03', '16.03', '17.03', '20.03', '29.03', '02.04', '22.09', '01.10'];
+
+  componentDidMount() {
+    this._key = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); this.setState({ palette: true, query: '' }); }
+      if (e.key === 'Escape') this.setState({ palette: false, selected: null, openDoc: null, compareDoc: null, drag: null });
+      const chatty = this.state.screen === 'case' || this.state.screen === 'war';
+      const tag = (e.target && e.target.tagName) || '';
+      if (chatty && !this.state.palette && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+        const list = this.state.screen === 'case' ? this._caseMsgs : this._warMsgs;
+        const n = (list || []).length;
+        if (e.key === 'j' || e.key === 'k') {
+          e.preventDefault();
+          const cur = this.state.focusIdx < 0 ? (e.key === 'j' ? -1 : n) : this.state.focusIdx;
+          const next = Math.max(0, Math.min(n - 1, cur + (e.key === 'j' ? 1 : -1)));
+          this.setState({ focusIdx: next });
+          const el = document.querySelector('[data-msg="' + next + '"]');
+          if (el && el.parentElement && el.parentElement.parentElement) {
+            const sc = el.closest('[data-chatscroll]');
+            if (sc) sc.scrollTop = Math.max(0, el.offsetTop - 160);
+          }
+        }
+        if (e.key === 'Enter' && this.state.focusIdx >= 0) {
+          const m = (list || [])[this.state.focusIdx];
+          if (m && m.pills && m.pills[0]) { e.preventDefault(); m.pills[0].open(); }
+        }
+        if (e.key === 'u') { e.preventDefault(); this.toggleDraft(); }
+      }
+      this.wake();
+    };
+    this._sel = () => {
+      const t = (window.getSelection() || {}).toString ? window.getSelection().toString().trim() : '';
+      if (t.length > 3 && t.length < 220) this.setState({ selText: t });
+    };
+    window.addEventListener('keydown', this._key);
+    document.addEventListener('selectionchange', this._sel);
+  }
+  chatScrollRef = (el) => {
+    this._chat = el;
+    if (el) this.scrollChat();
+  };
+
+  scrollChat() {
+    const run = () => {
+      const sc = this._chat || document.querySelector('[data-chatscroll]');
+      if (sc) sc.scrollTop = sc.scrollHeight;
+    };
+    requestAnimationFrame(run);
+    setTimeout(run, 90);
+    setTimeout(run, 420);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this._key);
+    document.removeEventListener('selectionchange', this._sel);
+    clearInterval(this._up); clearTimeout(this._t1); clearTimeout(this._t2); clearTimeout(this._dimT); clearTimeout(this._diveT);
+    window.removeEventListener('mousemove', this._dragMove); window.removeEventListener('mouseup', this._dragUp);
+  }
+
+  /* ---- 4 · funksjonelt lyddesign ---- */
+  ac() {
+    if (!this.state.sound) return null;
+    if (!this._ac) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; this._ac = new C(); }
+    if (this._ac.state === 'suspended') this._ac.resume();
+    return this._ac;
+  }
+  thump() {
+    const a = this.ac(); if (!a) return;
+    const t = a.currentTime, g = a.createGain(), lp = a.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 220;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.42, t + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.85);
+    [58, 116].forEach((f, i) => {
+      const o = a.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(f, t);
+      o.frequency.exponentialRampToValueAtTime(f * 0.72, t + 0.5);
+      const gg = a.createGain(); gg.gain.value = i ? 0.22 : 1;
+      o.connect(gg); gg.connect(g); o.start(t); o.stop(t + 0.9);
+    });
+    g.connect(lp); lp.connect(a.destination);
+  }
+  snap() {
+    const a = this.ac(); if (!a) return;
+    const t = a.currentTime, g = a.createGain(), bp = a.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = 1750; bp.Q.value = 1.6;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+    const o = a.createOscillator(); o.type = 'triangle'; o.frequency.setValueAtTime(2100, t);
+    o.frequency.exponentialRampToValueAtTime(760, t + 0.08);
+    o.connect(g); g.connect(bp); bp.connect(a.destination); o.start(t); o.stop(t + 0.1);
+  }
+
+  /* ---- 2 · taktil fysikk: ringbølge over gitteret ---- */
+  ripple(left, top) {
+    const id = Date.now() + Math.random();
+    this.setState({ ripples: this.state.ripples.concat([{ id, left, top }]) });
+    setTimeout(() => this.setState({ ripples: this.state.ripples.filter(r => r.id !== id) }), 1000);
+  }
+
+  /* ---- 3 · kognitiv belysning ---- */
+  wake = () => {
+    clearTimeout(this._dimT);
+    if (this.state.dim) this.setState({ dim: false });
+    if (this.state.screen === 'war') this._dimT = setTimeout(() => this.setState({ dim: true }), 3000);
+  };
+
+  /* ---- 1 · semantisk zoom ---- */
+  onWheel = (e) => {
+    if (this.state.diving != null) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const ox = ((e.clientX - r.left) / r.width * 100).toFixed(1) + '% ' + ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%';
+    const next = Math.max(0.55, Math.min(2.05, this.state.zoom * (e.deltaY < 0 ? 1.16 : 0.86)));
+    if (next >= 2 && this.state.hover != null) { this.dive(this.state.hover)(); return; }
+    this.setState({ zoom: next, origin: next < 1 ? '50% 50%' : ox });
+  };
+  dive = (i) => () => {
+    const n = this._pos && this._pos[i];
+    this.setState({ diving: i, zoom: 3.4, origin: n ? n.left + '% ' + n.top + '%' : '50% 50%' });
+    this.snap();
+    this._diveT = setTimeout(() => {
+      this.setState({ screen: 'war', diving: null, zoom: 1, origin: '50% 50%', warHi: 'time', selected: null, openDoc: 'b2' });
+      this.scrollPdf('time'); this.wake();
+    }, 520);
+  };
+
+  /* ---- 2 · dra relasjonstråd med treghet + snap ---- */
+  startThread = (i) => (e) => {
+    e.stopPropagation();
+    const host = this._canvas; if (!host) return;
+    const r = host.getBoundingClientRect(), p = this._pos[i];
+    const from = { x: p.left / 100 * r.width, y: p.top / 100 * r.height };
+    this._drag = { i, from, cur: { ...from }, target: { ...from }, r };
+    const tick = () => {
+      if (!this._drag) return;
+      const d = this._drag;
+      d.cur.x += (d.target.x - d.cur.x) * 0.17;
+      d.cur.y += (d.target.y - d.cur.y) * 0.17;
+      if (this._wire) this._wire.setAttribute('d', `M ${d.from.x / d.r.width * 1652} ${d.from.y / d.r.height * 998} L ${d.cur.x / d.r.width * 1652} ${d.cur.y / d.r.height * 998}`);
+      this._raf = requestAnimationFrame(tick);
+    };
+    this._dragMove = (ev) => { if (this._drag) { this._drag.target.x = ev.clientX - this._drag.r.left; this._drag.target.y = ev.clientY - this._drag.r.top; } };
+    this._dragUp = () => {
+      const d = this._drag; this._drag = null;
+      cancelAnimationFrame(this._raf);
+      window.removeEventListener('mousemove', this._dragMove); window.removeEventListener('mouseup', this._dragUp);
+      if (this._wire) this._wire.setAttribute('d', '');
+      this.setState({ wiring: false });
+      if (!d) return;
+      const lx = d.cur.x / d.r.width * 100, ly = d.cur.y / d.r.height * 100;
+      let best = null, bd = 9;
+      this._pos.forEach((p, j) => {
+        if (j === d.i) return;
+        const dist = Math.hypot(p.left - lx, (p.top - ly) * 0.55);
+        if (dist < bd) { bd = dist; best = j; }
+      });
+      if (best != null) {
+        const kind = this._pos[best].kind === 'AKTØR' ? 'REFERERER TIL' : 'BEVISER';
+        this.setState({ extraEdges: this.state.extraEdges.concat([[d.i, best, kind]]) });
+        this.snap(); this.ripple(this._pos[best].left, this._pos[best].top);
+      }
+    };
+    window.addEventListener('mousemove', this._dragMove); window.addEventListener('mouseup', this._dragUp);
+    this.setState({ wiring: true });
+    this._raf = requestAnimationFrame(tick);
+  };
+
+  /* ---- 5 · kontekstbevisst palett ---- */
+  toBevisNode = () => {
+    const t = this.state.selText || 'Utdrag fra Bilag 2, s. 4';
+    this.setState({
+      palette: false, screen: 'canvas', zoom: 1, origin: '50% 50%',
+      extraNodes: this.state.extraNodes.concat([{ kind: 'FAKTUM', title: t.length > 46 ? t.slice(0, 46) + '…' : t, cite: 'Bilag 2, s. 4', snippet: t, cluster: 1, isNew: true }])
+    });
+    this.snap();
+    setTimeout(() => { const p = this._pos[this._pos.length - 1]; if (p) this.ripple(p.left, p.top); }, 60);
+  };
+
+  go = (screen, soon) => () => this.setState({ screen, soon: soon || null, palette: false, selected: null });
+
+  startUpload = () => {
+    if (this.state.uploadPhase !== 'idle') return;
+    this.setState({ uploadPhase: 'running', uploadTick: 0 });
+    this._up = setInterval(() => {
+      const t = this.state.uploadTick + 1;
+      if (t >= 46) { clearInterval(this._up); this.setState({ uploadTick: 46, uploadPhase: 'done' }); }
+      else this.setState({ uploadTick: t });
+    }, 90);
+  };
+
+  generateSummary = () => {
+    if (this.state.aiTyping) return;
+    this.setState({ aiTyping: true }); this.scrollChat();
+    this._t1 = setTimeout(() => {
+      this.thump();
+      this.setState({
+        aiTyping: false, summary: true,
+        caseChat: this.state.caseChat.concat([
+          { who: 'me', text: 'Generer sakssummary.' },
+          {
+            who: 'ai', type: 'summary', text: 'Fire nøkkelpunkter. Ett av dem er bestridt, og jeg fant én reell motstrid mellom vitnene.',
+            points: [
+              { label: 'Ansvarsgrunnlag', text: 'Uaktsom kjøring er sannsynliggjort. Bilfører krysset sykkelfeltet i høyresving uten å gi tegn.', conf: 'bekreftet', confN: 3, pills: [['b1', 'car', 'Bilag 1, s. 3'], ['b2', 'car', 'Bilag 2, s. 4'], ['b7', 'car', 'Bilag 7, s. 1']] },
+              { label: 'Årsakssammenheng', text: 'Legeerklæringen knytter bruddet i høyre kne og hjernerystelsen direkte til hendelsen 14. mars.', conf: 'bekreftet', confN: 2, pills: [['b4', 'med', 'Bilag 4, s. 1'], ['b8', null, 'Bilag 8']] },
+              { label: 'Erstatningsposter', text: 'Samlet krav kr 418 500. Motparten har erkjent ansvar, men bestrider omfanget av inntektstapet.', conf: 'bestridt', pills: [['b12', 'okonomi', 'Bilag 12, s. 1'], ['b5', 'ansvar', 'Bilag 5, s. 31']] },
+              { label: 'Sykemeldingens lengde', text: 'Tolv ukers sykemelding er dokumentert av fastlege, men ingen uavhengig vurdering foreligger.', conf: 'enkilde', pills: [['b8', null, 'Bilag 8']] }
+            ]
+          },
+          { who: 'ai', type: 'conflict', text: 'Én motstrid krever avklaring før forliksmøtet.' }
+        ])
+      });
+      this.scrollChat();
+    }, 1700);
+  };
+
+  docFor(key) {
+    const d = this.DOCS[key];
+    if (!d) {
+      const n = +String(key).replace(/\D/g, '') || 1;
+      const b = this.BILAG[n - 1] || this.BILAG[0];
+      return { cite: b.cite, title: b.title, org: 'SAK-2023-0417 · KIRKERUD MOT ÅS', meta: b.meta, docTitle: b.title, foot: b.meta.toUpperCase(), paras: [{ text: 'Dokumentet er indeksert, men fullteksten er ikke med i denne prototypen. Innholdet er tilgjengelig som kildeutdrag i chatten.' }] };
+    }
+    return { ...d, paras: d.paras || this.PDF };
+  }
+
+  citeTo = (page, hi, doc) => (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    this.snap();
+    this.setState({ screen: 'war', warHi: hi, palette: false, openDoc: doc || 'b2', hoverPill: null });
+    this.scrollPdf(hi); this.wake();
+  };
+
+  openPill = (doc, hi) => (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    this.snap();
+    this.setState({ openDoc: doc, warHi: hi || null, hoverPill: null });
+    this.scrollPdf(hi);
+  };
+  pillEnter = (doc, hi) => (e) => {
+    if (this.state.drag) return;
+    const host = this._root || this._war; if (!host) return;
+    const r = host.getBoundingClientRect(), b = e.currentTarget.getBoundingClientRect();
+    const k = (r.width / 1920) || 1;
+    const top = (b.top - r.top) / k;
+    const below = top < 330;
+    this.setState({ hoverPill: { doc, hi, below, x: (b.left - r.left + b.width / 2) / k, y: below ? top + b.height / k : top } });
+  };
+  pillLeave = () => this.setState({ hoverPill: null });
+  closeDoc = () => this.setState({ openDoc: null, compareDoc: null });
+  toggleCompare = () => {
+    const cur = this.state.openDoc || 'b2';
+    const partner = { b2: 'b3', b3: 'b2', b1: 'b7', b7: 'b1', b5: 'b12', b12: 'b5', b4: 'b8', b8: 'b4', b11: 'b2' }[cur] || 'b1';
+    this.snap();
+    this.setState({ compareDoc: this.state.compareDoc ? null : partner });
+  };
+
+  /* ---- tillitsgradering ---- */
+  CONF = {
+    bekreftet: { label: 'BEKREFTET', color: '#6EE7C8', bg: 'rgba(9,44,38,.6)', border: 'rgba(37,208,166,.45)' },
+    enkilde: { label: 'ÉN KILDE', color: '#9DB4CE', bg: 'rgba(16,30,50,.6)', border: 'rgba(96,165,250,.3)' },
+    bestridt: { label: 'BESTRIDT AV MOTPART', color: '#F0B65C', bg: 'rgba(48,36,12,.6)', border: 'rgba(240,182,92,.45)' },
+    ingen: { label: 'INGEN KILDEDEKNING', color: '#F0785C', bg: 'rgba(48,18,14,.6)', border: 'rgba(240,120,92,.5)' }
+  };
+  confView(key, n) {
+    const c = this.CONF[key] || this.CONF.enkilde;
+    return { text: key === 'bekreftet' && n ? c.label + ' · ' + n + ' KILDER' : c.label, color: c.color, bg: c.bg, border: c.border };
+  }
+
+  /* ---- utkast med levende fotnoter ---- */
+  toDraft = (text, pills, conf) => () => {
+    const src = (pills && pills !== 'ALL' && pills.length) ? pills[0] : ['b2', null, 'Bilag 2, s. 4'];
+    this.snap();
+    this.setState({
+      draftOpen: true,
+      draft: this.state.draft.concat([{ text, doc: src[0], cite: src[2], conf: conf || 'enkilde' }])
+    });
+  };
+  removeDraft = (i) => () => this.setState({ draft: this.state.draft.filter((_, j) => j !== i) });
+  toggleDraft = () => this.setState({ draftOpen: !this.state.draftOpen });
+
+  /* ---- dra pille til lerret eller utkast ---- */
+  pillDown = (doc, hi, label, text) => (e) => {
+    if (e.button !== 0) return;
+    const host = this._root; if (!host) return;
+    const r = host.getBoundingClientRect();
+    const start = { x: e.clientX, y: e.clientY };
+    let live = false;
+    const move = (ev) => {
+      if (!live && Math.hypot(ev.clientX - start.x, ev.clientY - start.y) < 6) return;
+      if (!live) { live = true; this.setState({ drag: { doc, hi, label, text }, hoverPill: null }); }
+      const k = (r.width / 1920) || 1;
+      const pos = { x: (ev.clientX - r.left) / k, y: (ev.clientY - r.top) / k };
+      const inZone = (el) => {
+        if (!el) return false;
+        const b = el.getBoundingClientRect();
+        return ev.clientX >= b.left && ev.clientX <= b.right && ev.clientY >= b.top && ev.clientY <= b.bottom;
+      };
+      const zone = inZone(this._zoneCanvas) ? 'canvas' : inZone(this._zoneDraft) ? 'draft' : null;
+      this.setState({ dragPos: pos, dropZone: zone });
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up);
+      const z = this.state.dropZone, d = this.state.drag;
+      this.setState({ drag: null, dragPos: null, dropZone: null });
+      if (!live || !d) return;
+      if (z === 'canvas') {
+        this.snap();
+        this.setState({
+          extraNodes: this.state.extraNodes.concat([{ kind: 'FAKTUM', title: d.label, cite: d.label, snippet: d.text || d.label, cluster: 1, isNew: true }])
+        });
+        setTimeout(() => { const p = this._pos && this._pos[this._pos.length - 1]; if (p) this.ripple(p.left, p.top); }, 60);
+      } else if (z === 'draft') {
+        this.toDraft(d.text || d.label, [[d.doc, d.hi, d.label]], 'enkilde')();
+      }
+    };
+    window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+  };
+  zoneCanvasRef = el => { this._zoneCanvas = el; };
+  zoneDraftRef = el => { this._zoneDraft = el; };
+  rootRef = el => { this._root = el; };
+
+  /* ---- motstrid som objekt ---- */
+  resolveConflict = (choice) => () => {
+    this.thump();
+    this.setState({ conflictResolved: choice });
+  };
+
+  /* ---- feilmodus: ingen kildedekning ---- */
+  askNoSource = () => {
+    if (this.state.aiTyping) return;
+    this.setState({ aiTyping: true, caseChat: this.state.caseChat.concat([{ who: 'me', text: 'Var føreren ruspåvirket?' }]) }); this.scrollChat();
+    setTimeout(() => this.setState({
+      aiTyping: false,
+      scrollAfter: this.scrollChat(),
+      caseChat: this.state.caseChat.concat([{ who: 'ai', type: 'nosource', text: 'Ingen av de 12 bilagene omtaler rus, promilleprøve eller utåndingsprøve. Politirapporten har et felt for dette som står tomt. Jeg kan ikke sette opp en påstand uten dekning i kildene.', conf: 'ingen', pills: [['b1', null, 'Bilag 1, s. 6 — felt tomt']] }])
+    }), 1400);
+  };
+
+  askConflictCase = () => {
+    if (this.state.aiTyping) return;
+    this.setState({ aiTyping: true, caseChat: this.state.caseChat.concat([{ who: 'me', text: 'Hvor er vitnene uenige?' }]) }); this.scrollChat();
+    setTimeout(() => this.setState({
+      aiTyping: false,
+      scrollAfter: this.scrollChat(),
+      caseChat: this.state.caseChat.concat([{ who: 'ai', type: 'conflict', text: 'Det er én reell motstrid i saken. Den gjelder tidspunktet for sammenstøtet.' }])
+    }), 1400);
+  };
+
+  /* ---- eksport ---- */
+  exportReport = () => { this.thump(); this.setState({ exported: true }); setTimeout(() => this.setState({ exported: false }), 2600); };
+
+  /* ---- felles meldingsmodell ---- */
+  mapMsgs(list, offset) {
+    const s = this.state;
+    return list.map((m, i) => {
+      const idx = (offset || 0) + i;
+      const rawPills = m.pills === 'ALL' ? this.BILAG.map((b, j) => ['b' + (j + 1), null, b.cite]) : (m.pills || []);
+      const pills = rawPills.map(([doc, hi, label]) => {
+        const d = this.docFor(doc);
+        return {
+          label, doc,
+          border: s.openDoc === doc ? 'rgba(147,197,253,.85)' : 'rgba(96,165,250,.35)',
+          bg: s.openDoc === doc ? 'rgba(30,64,116,.6)' : 'rgba(12,28,52,.55)',
+          open: this.openPill(doc, hi),
+          enter: this.pillEnter(doc, hi),
+          leave: this.pillLeave,
+          down: this.pillDown(doc, hi, label, (d.paras && d.paras[0] ? d.paras[0].text : label))
+        };
+      });
+      const c = this.confView(m.conf, m.confN);
+      const me = m.who === 'me';
+      return {
+        idx, text: m.text || '', type: m.type || '',
+        isConflict: m.type === 'conflict', isNoSource: m.type === 'nosource', isSummary: m.type === 'summary',
+        isPlain: !m.type,
+        points: (m.points || []).map(p => {
+          const pc = this.confView(p.conf, p.confN);
+          const pp = (p.pills || []).map(([doc, hi, label]) => ({
+            label, doc,
+            border: s.openDoc === doc ? 'rgba(147,197,253,.85)' : 'rgba(96,165,250,.35)',
+            bg: s.openDoc === doc ? 'rgba(30,64,116,.6)' : 'rgba(12,28,52,.55)',
+            open: this.openPill(doc, hi), enter: this.pillEnter(doc, hi), leave: this.pillLeave,
+            down: this.pillDown(doc, hi, label, p.text)
+          }));
+          return { label: p.label, text: p.text, pills: pp, confText: pc.text, confColor: pc.color, confBg: pc.bg, confBorder: pc.border, add: this.toDraft(p.text, p.pills, p.conf) };
+        }),
+        hasPoints: !!(m.points && m.points.length),
+        align: me ? 'flex-end' : 'flex-start',
+        max: me ? '62%' : '82%',
+        who: me ? 'ADVOKAT A. KRISTIANSEN' : 'EVIDA',
+        whoColor: me ? '#7FB3FF' : '#6EE7C8',
+        border: s.focusIdx === idx ? '#BFDBFE' : m.type === 'nosource' ? 'rgba(240,120,92,.5)' : me ? 'rgba(96,165,250,.32)' : 'rgba(37,208,166,.3)',
+        bg: m.type === 'nosource' ? 'rgba(38,16,14,.5)' : me ? 'rgba(20,42,76,.62)' : 'rgba(9,26,32,.5)',
+        pills, hasPills: pills.length > 0,
+        hasConf: !!m.conf, confText: c.text, confColor: c.color, confBg: c.bg, confBorder: c.border,
+        canAdd: !me && !!m.text,
+        add: this.toDraft(m.text, rawPills, m.conf)
+      };
+    });
+  }
+
+  scrollPdf(hi) {
+    setTimeout(() => {
+      const box = this._pdf;
+      if (!box) return;
+      const list = (this.docFor(this.state.openDoc || 'b2').paras) || [];
+      const idx = list.findIndex(p => p.hi === hi);
+      const el = box.querySelectorAll('p')[idx < 0 ? 0 : idx];
+      if (el) box.scrollTop = Math.max(0, el.offsetTop - 220);
+    }, 80);
+  }
+
+  askConflict = () => {
+    if (this.state.warTyping) return;
+    this.setState({ warTyping: true, warExtra: this.state.warExtra.concat([{ who: 'me', text: 'Hvor er vitnene uenige?' }]) }); this.scrollChat();
+    this._t2 = setTimeout(() => this.setState({
+      warTyping: false, warHi: 'time', scrollAfter: this.scrollChat(),
+      warExtra: this.state.warExtra.concat([{ text: 'Uenigheten gjelder bare tidspunktet. Holm oppgir 07:45 og viser til at han så på klokka. Berg sier «rundt åtte» uten nærmere holdepunkt. Politiets operasjonslogg viser innringing 07:52, og motpartens egen skademelding angir 07:45 — begge støtter Holm.', pills: [['b2', 'time', 'Bilag 2, s. 4'], ['b11', 'time', 'Bilag 11, s. 5'], ['b7', 'time', 'Bilag 7, s. 1']] }])
+    }), 1500);
+  };
+  askTimeline = () => this.citeTo(4, 'time')();
+
+  renderVals() {
+    const s = this.state;
+    const P = this.props;
+    const particles = [];
+    if (P.showParticles !== false) {
+      const n = 34;
+      for (let i = 0; i < n; i++) {
+        const r = (i * 9301 + 49297) % 233280 / 233280;
+        const r2 = (i * 4177 + 7919) % 65536 / 65536;
+        particles.push({
+          left: +(r * 100).toFixed(1), top: +(20 + r2 * 85).toFixed(1),
+          size: r2 > .82 ? 5 : r2 > .5 ? 3 : 2,
+          color: i % 3 === 0 ? 'rgba(110,231,200,.9)' : 'rgba(147,197,253,.9)',
+          blur: r2 > .82 ? 16 : 9,
+          dur: +(12 + r * 16).toFixed(1), delay: +(r2 * 14).toFixed(1)
+        });
+      }
+    }
+
+    const navDefs = [
+      ['⌂', 'Hjem', 'home', ''], ['▤', 'Dokumenter', 'upload', ''], ['◫', 'Saksrommet', 'case', ''],
+      ['⬡', 'Sakslerretet', 'canvas', ''], ['◧', 'Saksrom', 'war', ''],
+      ['⬓', 'Arbeidslerret', 'board', 'NY'], ['◷', 'Kronologi', 'zoomout', 'ZOOM'], ['◈', 'Risiko', 'soon:Risiko', 'SNART'], ['≡', 'Rapport', 'report', '']
+    ];
+    const nav = navDefs.map(([glyph, label, target, tag]) => {
+      const soon = target.startsWith('soon:');
+      const zo = target === 'zoomout';
+      const key = soon ? 'soon' : zo ? 'canvas' : target;
+      const active = soon ? s.screen === 'soon' && s.soon === target.slice(5)
+        : zo ? s.screen === 'canvas' && s.zoom < 0.75
+        : s.screen === key && !(key === 'canvas' && s.zoom < 0.75);
+      return {
+        glyph, label, tag,
+        color: active ? '#EAF2FD' : soon ? '#5E7692' : '#A8BCD4',
+        bg: active ? 'rgba(59,130,246,.16)' : 'transparent',
+        mark: active ? '#60A5FA' : 'transparent',
+        cursor: 'pointer',
+        go: soon ? this.go('soon', target.slice(5))
+          : zo ? () => this.setState({ screen: 'canvas', zoom: 0.58, origin: '50% 50%', selected: null, palette: false })
+          : () => { this.setState({ screen: key, soon: null, palette: false, selected: null, openDoc: null, hoverPill: null, zoom: key === 'canvas' ? 1 : s.zoom, origin: '50% 50%' }); this.scrollChat(); }
+      };
+    });
+
+    const titles = {
+      home: ['EVIDA', 'KILDEBUNDET JURIDISK ARBEIDSROM'],
+      upload: ['Opplasting', 'DOKUMENTSTRØM · SAK-2023-0417'],
+      case: ['Saksrommet', 'THE CASE ROOM · KIRKERUD MOT ÅS'],
+      canvas: [s.zoom < 0.75 ? 'Kronologi' : 'Sakslerretet', s.zoom < 0.75 ? 'MORFET UT FRA SAKSLERRETET · SIKRE OG USIKRE HENDELSER' : 'VISUAL CASE CANVAS · SEMANTISK ZOOM'],
+      war: ['Saksrom', 'THE WAR ROOM · BILAG 2'],
+      report: ['Prosesskriv', 'RAPPORTUTKAST · SAK-2023-0417'],
+      board: ['Arbeidslerret', 'FLYTT BOKSENE · DRA RELASJONER MELLOM DEM'],
+      soon: [s.soon || '', 'MODUL']
+    };
+
+    const tick = s.uploadTick;
+    const uploads = this.FILES.map((f, i) => {
+      const raw = Math.max(0, Math.min(100, (tick - i * 3) * 12));
+      const pct = s.uploadPhase === 'idle' ? 0 : raw;
+      const stage = pct === 0 ? 'I KØ' : pct < 40 ? 'OPPLASTING' : pct < 75 ? 'OCR-ANALYSE' : pct < 100 ? 'DATAINDEKSERING' : 'INDEKSERT';
+      const done = pct >= 100;
+      return { ...f, pct, stage, tint: done ? '#25D0A6' : '#60A5FA', border: done ? 'rgba(37,208,166,.4)' : 'rgba(96,165,250,.24)' };
+    });
+    const doneCount = uploads.filter(u => u.pct >= 100).length;
+    const uploadReady = s.uploadPhase === 'done';
+
+    const bilag = this.BILAG.map((d, i) => ({ ...d, openWar: this.citeTo(1, d.cite === 'Bilag 2' ? 'time' : null, 'b' + (i + 1)) }));
+
+    const caseMsgs = this.mapMsgs(s.caseChat, 0);
+    this._caseMsgs = caseMsgs;
+
+    // canvas layout
+    const ALL = this.NODES.concat(s.extraNodes);
+    const count = Math.min(ALL.length, (P.nodeCount || 40) + s.extraNodes.length);
+    // Deterministic non-overlapping slots per cluster: 11.5% column pitch (node ≈10.2% wide),
+    // 10.2% row pitch (node ≈7% tall), ±1.6% jitter for an organic feel that stays collision-free.
+    const CLUSTERS = {
+      0: { x: 7, y: 19, cols: 2 },
+      1: { x: 33, y: 19, cols: 3 },
+      2: { x: 7, y: 58, cols: 2 },
+      3: { x: 69, y: 25, cols: 3 },
+      4: { x: 60, y: 58, cols: 3 }
+    };
+    const used = {}, tlUsed = {}, unsureUsed = { n: 0 };
+    const nodes = [];
+    // morf: 0 = sakslerret, 1 = kronologi (styrt av zoom-nivået)
+    const m = Math.min(1, Math.max(0, (1 - Math.min(1, s.zoom)) / 0.45));
+    const lerp = (a, b) => a + (b - a) * m;
+    for (let i = 0; i < count; i++) {
+      const nd = ALL[i];
+      const bil = +(String(nd.cite).match(/Bilag (\d+)/) || [0, 1])[1];
+      const date = this.DATE_BY_BILAG[bil] || '14.03';
+      const unsure = bil === 3 || /rundt åtte/i.test(nd.title);
+      let left, top;
+      if (s.layout === 'grid') {
+        const cols = 8;
+        left = 9 + (i % cols) * 11.4;
+        top = 22 + Math.floor(i / cols) * 17.4;
+      } else {
+        const c = CLUSTERS[nd.cluster] || CLUSTERS[0];
+        const k = used[nd.cluster] || 0;
+        used[nd.cluster] = k + 1;
+        const col = k % c.cols, row = Math.floor(k / c.cols);
+        left = c.x + col * 11.5;
+        top = c.y + row * 10.2 + (col % 2 ? 1.6 : 0);
+        left = Math.min(93, Math.max(6.5, left));
+        top = Math.min(89, Math.max(7, top));
+      }
+      if (m > 0) {
+        let tx, ty;
+        if (unsure) { const k = unsureUsed.n++; tx = 60 + k * 11.5; ty = 8 + (k % 2) * 8; }
+        else {
+          const bi = Math.max(0, this.BUCKETS.indexOf(date));
+          const k = tlUsed[date] || 0; tlUsed[date] = k + 1;
+          tx = 8 + bi * 10.5; ty = 40 + k * 10.4;
+        }
+        left = lerp(left, Math.min(93, Math.max(6.5, tx)));
+        top = lerp(top, Math.min(89, Math.max(7, ty)));
+      }
+      const tint = nd.kind === 'AKTØR' ? '#6EE7C8' : nd.kind === 'SOURCEUNIT' ? '#93C5FD' : '#A8C0DA';
+      const sel = s.selected === i;
+      const unsureNow = unsure && m > 0.3;
+      nodes.push({
+        ...nd, left: +left.toFixed(2), top: +top.toFixed(2), w: nd.kind === 'SOURCEUNIT' ? 168 : 152,
+        tint, dateLabel: date,
+        border: sel ? '#BFDBFE' : unsureNow ? 'rgba(240,120,92,.85)' : nd.isNew ? 'rgba(110,231,200,.85)' : nd.kind === 'AKTØR' ? 'rgba(37,208,166,.45)' : 'rgba(96,165,250,.4)',
+        bstyle: unsureNow ? 'dashed' : 'solid',
+        shadow: sel ? '0 0 0 1px #BFDBFE, 0 0 44px -8px rgba(147,197,253,.95)' : unsureNow ? '0 0 30px -12px rgba(240,120,92,.9)' : '0 0 26px -14px rgba(59,130,246,.9)',
+        select: () => { this.setState({ selected: i }); this.snap(); },
+        dive: this.dive(i),
+        hover: () => { if (this.state.hover !== i) this.setState({ hover: i }); },
+        startThread: this.startThread(i)
+      });
+    }
+    this._pos = nodes;
+    const colFor = k => k === 'BEVISER' ? '#25D0A6' : k === 'MOTSIER' ? '#F0785C' : k === 'AVKLART' ? '#7FE3C0' : '#60A5FA';
+    // Work in the canvas' own px space (viewBox 1652×998 = content area at 1920×1080).
+    const CW = 1652, CH = 998, NH = 69;
+    const px = n => ({ x: n.left / 100 * CW, y: n.top / 100 * CH, hw: n.w / 2, hh: NH / 2 });
+    const boxes = nodes.map(n => { const p = px(n); return { x1: p.x - p.hw - 3, y1: p.y - p.hh - 3, x2: p.x + p.hw + 3, y2: p.y + p.hh + 3 }; });
+    // Trim a centre-to-centre segment to the card border so the thread starts in open space.
+    const exit = (p, dx, dy, pad) => {
+      const tx = dx ? (p.hw + pad) / Math.abs(dx) : Infinity;
+      const ty = dy ? (p.hh + pad) / Math.abs(dy) : Infinity;
+      return Math.min(1, Math.min(tx, ty));
+    };
+    const edges = [], edgeLabels = [];
+    this.EDGE_SPEC.concat(s.extraEdges).forEach(([a, b, k0]) => {
+      const kind = k0 === 'MOTSIER' && s.conflictResolved === 'holm' ? 'AVKLART' : k0;
+      const A = nodes[a], B = nodes[b];
+      if (!A || !B) return;
+      const pa = px(A), pb = px(B);
+      const dx = pb.x - pa.x, dy = pb.y - pa.y;
+      const ta = exit(pa, dx, dy, 4), tb = exit(pb, -dx, -dy, 4);
+      const x1 = pa.x + dx * ta, y1 = pa.y + dy * ta;
+      const x2 = pb.x - dx * tb, y2 = pb.y - dy * tb;
+      const bow = Math.abs(dx) > Math.abs(dy) ? -26 : 0;
+      const cx = (x1 + x2) / 2 + (bow ? 0 : 26), cy = (y1 + y2) / 2 + bow;
+      edges.push({
+        d: `M ${x1.toFixed(1)} ${y1.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`,
+        stroke: colFor(kind), w: kind === 'MOTSIER' ? 1.9 : 1.5,
+        dash: kind === 'MOTSIER' ? '5 5' : 'none', op: kind === 'MOTSIER' ? .9 : .68
+      });
+      if (edgeLabels.length >= 12) return;
+      // Quadratic apex — the visible gap between the two cards.
+      const lx = .25 * x1 + .5 * cx + .25 * x2, ly = .25 * y1 + .5 * cy + .25 * y2;
+      const lw = kind.length * 6.6 + 14, lh = 18;
+      const r = { x1: lx - lw / 2, y1: ly - lh / 2, x2: lx + lw / 2, y2: ly + lh / 2 };
+      const hits = boxes.some(bx => r.x1 < bx.x2 && r.x2 > bx.x1 && r.y1 < bx.y2 && r.y2 > bx.y1);
+      if (hits) return;
+      edgeLabels.push({ left: +(lx / CW * 100).toFixed(2), top: +(ly / CH * 100).toFixed(2), text: kind, color: colFor(kind) });
+    });
+    const sel = s.selected != null ? nodes[s.selected] : null;
+
+    const warBase = [
+      { who: 'me', text: 'Kan du lese Bilag 2 og se den mot Bilag 3? Jeg trenger å vite om vitnene forklarer seg likt.' },
+      { who: 'ai', text: 'Jeg har lest begge forklaringene. Vitnene er enige om hendelsesforløpet, men ikke om tidspunktet. Holm er presis, Berg er omtrentlig.', conf: 'bekreftet', confN: 2, pills: [['b2', 'time', 'Bilag 2, s. 4'], ['b3', 'time', 'Bilag 3, s. 2']] },
+      { who: 'ai', text: 'Holm beskriver at bilen svingte til høyre uten å gi tegn, og at han ikke så bremselys før etter sammenstøtet. Politirapporten beskriver det samme, og motpartens egen skademelding bekrefter høyresvingen.', conf: 'bekreftet', confN: 3, pills: [['b2', 'car', 'Bilag 2, s. 4'], ['b1', 'car', 'Bilag 1, s. 3'], ['b7', 'car', 'Bilag 7, s. 1']] },
+      { who: 'ai', type: 'conflict', text: 'Selve avviket ser slik ut:' }
+    ];
+    const warChat = this.mapMsgs(warBase.concat(s.warExtra), 0);
+    this._warMsgs = warChat;
+
+    const doc = this.docFor(s.openDoc || 'b2');
+    const cmp = s.compareDoc ? this.docFor(s.compareDoc) : null;
+    const cmpParas = cmp ? (cmp.paras || []).map(p => ({
+      text: p.text,
+      bg: p.hi && p.hi === s.warHi ? 'rgba(250,204,21,.45)' : 'transparent',
+      tag: p.hi && p.hi === s.warHi ? 'AVVIK' : '',
+      tagOp: p.hi && p.hi === s.warHi ? 1 : 0
+    })) : [];
+    const docParas = (doc.paras || []).map(p => ({
+      text: p.text,
+      bg: p.hi && p.hi === s.warHi ? 'rgba(250,204,21,.55)' : 'transparent',
+      ring: p.hi && p.hi === s.warHi ? '0 0 0 6px rgba(250,204,21,.25)' : 'none',
+      tag: cmp && p.hi && p.hi === s.warHi ? 'AVVIK' : '',
+      tagOp: cmp && p.hi && p.hi === s.warHi ? 1 : 0
+    }));
+    const hp = s.hoverPill;
+    const hdoc = hp ? this.docFor(hp.doc) : null;
+    const hoverParas = hdoc ? (hdoc.paras || []).filter(p => !hp.hi || p.hi === hp.hi).concat((hdoc.paras || []).filter(p => hp.hi && p.hi !== hp.hi)).slice(0, 2).map(p => ({
+      text: p.text.length > 190 ? p.text.slice(0, 190) + '…' : p.text,
+      mark: hp.hi && p.hi === hp.hi ? 'rgba(250,204,21,.4)' : 'transparent'
+    })) : [];
+
+    // ---- arbeidslerret ----
+    const bxs = s.boxes || this.BOXES0, lks = s.links || this.LINKS0;
+    const BW = this.BOX_W, BH = this.BOX_H;
+    const byId = {}; bxs.forEach(b => { byId[b.id] = b; });
+    const depth = {}; bxs.forEach(b => { depth[b.id] = 0; });
+    for (let pass = 0; pass < bxs.length; pass++) {
+      lks.forEach(l => { if (l.type === 'folger' && byId[l.from] && byId[l.to]) depth[l.to] = Math.max(depth[l.to], depth[l.from] + 1); });
+    }
+    const inFolger = {}; lks.forEach(l => { if (l.type === 'folger') { inFolger[l.from] = 1; inFolger[l.to] = 1; } });
+    const styrke = {}, refs = {}, motstrid = {}, usikker = {};
+    lks.forEach(l => {
+      if (l.type === 'beviser') styrke[l.to] = (styrke[l.to] || 0) + 1;
+      if (l.type === 'referer') { refs[l.to] = (refs[l.to] || 0) + 1; refs[l.from] = (refs[l.from] || 0) + 1; }
+      if (l.type === 'motsier' && !l.resolved) { motstrid[l.to] = 1; motstrid[l.from] = 1; }
+      if (l.type === 'usikker') usikker[l.to] = 1;
+    });
+    const boardBoxes = bxs.map(b => {
+      const st = styrke[b.id] || 0, mo = !!motstrid[b.id], us = !!usikker[b.id];
+      const badge = mo ? 'TIL AVKLARING' : st >= 2 ? 'BEKREFTET · ' + st + ' BEVIS' : st === 1 ? 'ÉN KILDE' : us ? 'USIKKER' : '';
+      const bc = mo ? '#F0B65C' : st >= 2 ? '#25D0A6' : us ? '#F0B65C' : 'rgba(96,165,250,.45)';
+      return {
+        ...b, w: BW, h: BH,
+        border: s.dragBox === b.id ? '#BFDBFE' : bc,
+        bstyle: us && !mo ? 'dashed' : 'solid',
+        shadow: s.dragBox === b.id ? '0 26px 50px -18px rgba(0,0,0,.9), 0 0 0 1px #BFDBFE' : '0 18px 34px -22px rgba(0,0,0,.85)',
+        badge, hasBadge: !!badge,
+        badgeColor: mo ? '#F0B65C' : st >= 2 ? '#6EE7C8' : us ? '#F0B65C' : '#9DB4CE',
+        seq: inFolger[b.id] ? String(depth[b.id] + 1) : '',
+        hasSeq: !!inFolger[b.id],
+        refText: (refs[b.id] || 0) ? (refs[b.id] + (refs[b.id] === 1 ? ' henvisning' : ' henvisninger')) : '',
+        drag: this.startBoxDrag(b.id), wire: this.startWire(b.id),
+        z: s.dragBox === b.id ? 30 : 6
+      };
+    });
+    const boardLinks = [], boardLabels = [];
+    lks.forEach((l, i) => {
+      const A = byId[l.from], B = byId[l.to];
+      if (!A || !B) return;
+      const t = this.LINK_TYPES.find(x => x.id === l.type) || this.LINK_TYPES[0];
+      const ax = A.x + BW / 2, ay = A.y + BH / 2, bx2 = B.x + BW / 2, by2 = B.y + BH / 2;
+      const dx = bx2 - ax, dy = by2 - ay;
+      const cut = () => Math.min(1, Math.min(dx ? (BW / 2 + 10) / Math.abs(dx) : 9, dy ? (BH / 2 + 10) / Math.abs(dy) : 9));
+      const t0 = cut();
+      const x1 = ax + dx * t0, y1 = ay + dy * t0, x2 = bx2 - dx * t0, y2 = by2 - dy * t0;
+      const cx = (x1 + x2) / 2 + (Math.abs(dx) > Math.abs(dy) ? 0 : 44), cy = (y1 + y2) / 2 - (Math.abs(dx) > Math.abs(dy) ? 36 : 0);
+      const resolved = l.type === 'motsier' && l.resolved;
+      const ang = Math.atan2(y2 - cy, x2 - cx);
+      const hl = 13, hw = 5.5;
+      const bxp = x2 - Math.cos(ang) * hl, byp = y2 - Math.sin(ang) * hl;
+      const head = [
+        x2.toFixed(1) + ',' + y2.toFixed(1),
+        (bxp - Math.sin(ang) * hw).toFixed(1) + ',' + (byp + Math.cos(ang) * hw).toFixed(1),
+        (bxp + Math.sin(ang) * hw).toFixed(1) + ',' + (byp - Math.cos(ang) * hw).toFixed(1)
+      ].join(' ');
+      boardLinks.push({
+        d: 'M ' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' Q ' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + bxp.toFixed(1) + ' ' + byp.toFixed(1),
+        head, stroke: resolved ? '#7FE3C0' : t.color, dash: resolved ? 'none' : t.dash,
+        w: l.type === 'motsier' ? 2.2 : 1.8
+      });
+      boardLabels.push({
+        left: (.25 * x1 + .5 * cx + .25 * x2), top: (.25 * y1 + .5 * cy + .25 * y2),
+        text: resolved ? 'AVKLART' : t.label, color: resolved ? '#7FE3C0' : t.color, remove: this.dropLink(i)
+      });
+    });
+    const boardWire = s.wire && byId[s.wire.from] ? {
+      d: 'M ' + (byId[s.wire.from].x + BW / 2) + ' ' + (byId[s.wire.from].y + BH / 2) + ' L ' + s.wire.x + ' ' + s.wire.y,
+      color: (this.LINK_TYPES.find(x => x.id === s.linkType) || {}).color
+    } : null;
+    const activeType = this.LINK_TYPES.find(x => x.id === s.linkType) || this.LINK_TYPES[0];
+
+    const ctx = s.selText ? [
+      { group: 'MARKERING', label: 'Konverter til Bevis-node', hint: '⏎', tint: '#6EE7C8', run: this.toBevisNode },
+      { group: 'MARKERING', label: 'Be EVIDA finne motstridende vitner', hint: '⏎', tint: '#6EE7C8', run: () => { this.setState({ palette: false, screen: 'war' }); this.askConflict(); } },
+      { group: 'MARKERING', label: 'Lås kildehenvisning i utkastet', hint: '⌘⇧L', tint: '#6EE7C8', run: () => { this.snap(); this.setState({ palette: false }); } }
+    ] : [];
+    const cmds = ctx.concat([
+      { group: 'NAVIGER', label: 'Åpne Sakslerretet', hint: 'canvas', tint: '#60A5FA', run: this.go('canvas') },
+      { group: 'NAVIGER', label: 'Åpne Saksrommet', hint: 'case', tint: '#60A5FA', run: this.go('case') },
+      { group: 'NAVIGER', label: 'Åpne Saksrom (kilde + assistent)', hint: 'war', tint: '#60A5FA', run: this.go('war') },
+      { group: 'HANDLING', label: 'Generer sakssummary', hint: '⏎', tint: '#6EE7C8', run: () => { this.setState({ palette: false, screen: 'case' }); this.generateSummary(); } },
+      { group: 'HANDLING', label: 'Finn motstrid mellom vitnene', hint: '⏎', tint: '#6EE7C8', run: () => { this.setState({ palette: false, screen: 'war' }); this.askConflict(); } },
+      { group: 'HANDLING', label: 'Last opp nye bilag', hint: 'upload', tint: '#6EE7C8', run: this.go('upload') }
+    ]).concat(this.BILAG.map((d, i) => ({ group: 'BILAG', label: d.title, hint: d.cite, tint: '#8497B0', run: this.citeTo(1, d.cite === 'Bilag 2' ? 'time' : null, 'b' + (i + 1)) })));
+    const q = s.query.trim().toLowerCase();
+    const paletteResults = (q ? cmds.filter(c => (c.label + ' ' + c.group + ' ' + c.hint).toLowerCase().includes(q)) : cmds).slice(0, 9);
+
+    return {
+      particles, nav,
+      screenTitle: titles[s.screen][0], screenSub: titles[s.screen][1],
+      isHome: s.screen === 'home', isUpload: s.screen === 'upload', isCase: s.screen === 'case',
+      isCanvas: s.screen === 'canvas', isWar: s.screen === 'war', isSoon: s.screen === 'soon',
+      isChat: s.screen === 'case' || s.screen === 'war',
+      chatMsgs: s.screen === 'war' ? warChat : caseMsgs,
+      chatTyping: s.screen === 'war' ? s.warTyping : s.aiTyping,
+      showFocusStrip: s.screen === 'war',
+      composerText: s.screen === 'war' ? 'Spør om Bilag 2 — bilagene henger ved svaret' : 'Spør EVIDA om saken — hvert svar kommer med kilde',
+      suggestions: s.screen === 'war' ? [
+        { label: 'Hvor er vitnene uenige?', run: this.askConflict },
+        { label: 'Fastslå tidspunkt', run: this.askTimeline },
+        { label: 'Vis sammenhengene på lerretet', run: this.go('canvas') }
+      ] : [
+        { label: 'Generer sakssummary', run: this.generateSummary },
+        { label: 'Hvor er vitnene uenige?', run: this.askConflictCase },
+        { label: 'Var føreren ruspåvirket?', run: this.askNoSource },
+        { label: 'Bygg prosesskriv', run: () => this.setState({ screen: 'report' }) }
+      ],
+      soonTitle: s.soon || '', soonBody: s.soon === 'Kronologi' ? 'Tidslinjen med sikre og usikre hendelser er neste modul. Sikre hendelser får solid kant, usikre plasseres i en egen klynge.' : s.soon === 'Risiko' ? 'Devil\u2019s Advocate-modus vurderer svakheter i saken og skifter til en varmere palett. Kommer i neste runde.' : 'Rapportbyggeren samler summary, kronologi og bevismatrise til et eksporterbart dokument.',
+      goUpload: this.go('upload'), goCase: this.go('case'), goCanvas: this.go('canvas'), goWar: this.go('war'),
+      startUpload: this.startUpload, uploads,
+      uploadStatus: s.uploadPhase === 'idle' ? 'VENTER PÅ FILER' : uploadReady ? '8/8 INDEKSERT · KLAR' : doneCount + '/8 FERDIG · BEHANDLER',
+      ctaBorder: uploadReady ? 'rgba(147,197,253,.8)' : 'rgba(96,165,250,.18)',
+      ctaColor: uploadReady ? '#EAF2FD' : '#5E7692',
+      ctaBg: uploadReady ? 'linear-gradient(120deg, rgba(30,64,116,.8), rgba(14,32,60,.6))' : 'transparent',
+      bilag, aiTyping: s.aiTyping,
+      showDocGrid: !s.summary, showSummary: s.summary,
+      summaryCta: s.aiTyping ? 'ANALYSERER …' : 'GENERER SAKSSUMMARY',
+      generateSummary: this.generateSummary,
+      resetSummary: () => this.setState({ summary: false }),
+      citeB1: this.citeTo(3, 'car', 'b1'), citeB2: this.citeTo(4, 'time', 'b2'), citeB3: this.citeTo(2, 'time', 'b3'),
+      citeB4: this.citeTo(1, 'med', 'b4'), citeB5: this.citeTo(31, 'ansvar', 'b5'), citeB8: this.citeTo(1, null, 'b8'), citeB12: this.citeTo(1, 'okonomi', 'b12'),
+      nodes, edges, edgeLabels,
+      toggleLayout: () => this.setState({ layout: s.layout === 'grid' ? 'organic' : 'grid' }),
+      layoutLabel: s.layout === 'grid' ? 'Organisk layout' : 'Organiser layout',
+      canvasStats: count + ' NODER · ' + (this.EDGE_SPEC.length + s.extraEdges.length) + ' RELASJONER · ' + (s.conflictResolved === 'holm' ? '0 MOTSTRID · 1 AVKLART' : '1 MOTSTRID'),
+      hasSelection: !!sel, selKind: sel ? sel.kind : '', selTitle: sel ? sel.title : '',
+      selSnippet: sel ? sel.snippet : '', selCite: sel ? '[' + sel.cite + ']' : '',
+      popLeft: sel ? Math.min(62, Math.max(4, sel.left + 8)) : 0,
+      popTop: sel ? Math.min(58, Math.max(4, sel.top + 4)) : 0,
+      clearSelection: () => this.setState({ selected: null }),
+      caseMsgs, warChat, warTyping: s.warTyping, chatScrollRef: this.chatScrollRef,
+      warRef: el => { this._war = el; }, rootRef: this.rootRef,
+      // motstrid
+      conflictOpen: !s.conflictResolved, conflictDone: !!s.conflictResolved,
+      conflictVerdict: s.conflictResolved === 'holm' ? 'AVKLART · 07:45 LAGT TIL GRUNN — STØTTET AV TRE UAVHENGIGE KILDER' : 'MARKERT SOM USIKKERT — BEGGE TIDSANGIVELSER BEHOLDES I KRONOLOGIEN',
+      resolveHolm: this.resolveConflict('holm'), resolveBoth: this.resolveConflict('begge'),
+      openB2: this.openPill('b2', 'time'), openB3: this.openPill('b3', 'time'),
+      openB11: this.openPill('b11', 'time'), openB7: this.openPill('b7', 'time'),
+      // utkast
+      draftOpen: s.draftOpen, toggleDraft: this.toggleDraft,
+      draftCount: s.draft.length, draftEmpty: s.draft.length === 0,
+      draftLabel: s.draft.length + (s.draft.length === 1 ? ' PÅSTAND' : ' PÅSTANDER'),
+      draftItems: s.draft.map((d, i) => {
+        const c = this.confView(d.conf);
+        return {
+          n: i + 1, text: d.text, cite: d.cite,
+          warn: d.conf === 'bestridt' || d.conf === 'ingen',
+          warnText: d.conf === 'bestridt' ? 'KILDEN ER BESTRIDT AV MOTPART' : 'MANGLER KILDEDEKNING',
+          color: c.color, remove: this.removeDraft(i), open: this.openPill(d.doc, null)
+        };
+      }),
+      zoneCanvasRef: this.zoneCanvasRef, zoneDraftRef: this.zoneDraftRef,
+      dragging: !!s.drag, dragLabel: s.drag ? s.drag.label : '',
+      dragX: s.dragPos ? s.dragPos.x : 0, dragY: s.dragPos ? s.dragPos.y : 0,
+      zoneCanvasBorder: s.dropZone === 'canvas' ? '#93C5FD' : 'rgba(96,165,250,.3)',
+      zoneDraftBorder: s.dropZone === 'draft' ? '#6EE7C8' : 'rgba(37,208,166,.3)',
+      // diff
+      compareOn: !!s.compareDoc, toggleCompare: this.toggleCompare,
+      compareLabel: s.compareDoc ? 'Lukk sammenligning' : 'Sammenlign kilder',
+      cmpParas, cmpTitle: cmp ? cmp.title : '', cmpCite: cmp ? cmp.cite.toUpperCase() : '',
+      cmpOrg: cmp ? cmp.org : '', cmpMeta: cmp ? cmp.meta : '', cmpHeading: cmp ? (cmp.docTitle || cmp.title) : '',
+      paperWidth: s.compareDoc ? 470 : 800, paperPad: s.compareDoc ? '46px 44px 60px' : '70px 78px 86px',
+      sheetWidth: s.compareDoc ? 1120 : 1000,
+      // rapport
+      isReport: s.screen === 'report',
+      reportPoints: this.REPORT_POINTS.map((p, i) => ({ ...p, n: i + 1 })),
+      reportDraft: s.draft.map((d, i) => ({ n: this.REPORT_POINTS.length + i + 1, text: d.text, cite: d.cite })),
+      hasReportDraft: s.draft.length > 0,
+      reportRows: this.REPORT_ROWS,
+      reportFootnotes: this.REPORT_POINTS.map((p, i) => ({ n: i + 1, cite: p.cite })).concat(s.draft.map((d, i) => ({ n: this.REPORT_POINTS.length + i + 1, cite: d.cite }))),
+      exportReport: this.exportReport, exportLabel: s.exported ? 'EKSPORTERT ✓' : 'Eksporter prosesskriv',
+      goReport: () => this.setState({ screen: 'report', palette: false }),
+      askNoSource: this.askNoSource, askConflictCase: this.askConflictCase,
+      // arbeidslerret
+      isBoard: s.screen === 'board', boardHost: this.boardHost,
+      boardBoxes, boardLinks, boardLabels,
+      wireOn: !!boardWire, wireD: boardWire ? boardWire.d : '', wireColor: boardWire ? boardWire.color : '#60A5FA',
+      linkTypes: this.LINK_TYPES.map(t => ({
+        ...t, active: s.linkType === t.id,
+        bg: s.linkType === t.id ? 'rgba(255,255,255,.06)' : 'transparent',
+        bord: s.linkType === t.id ? t.color : 'rgba(96,165,250,.22)',
+        pick: this.setLinkType(t.id)
+      })),
+      activeFn: activeType.fn, activeColor: activeType.color, activeLabel: activeType.label,
+      boardStats: bxs.length + ' BOKSER · ' + lks.length + ' RELASJONER',
+      boardConflict: lks.some(l => l.type === 'motsier' && !l.resolved),
+      resolveBoardConflict: this.resolveBoardConflict, clearBoard: this.clearBoard,
+      docOpen: !!s.openDoc, docParas, docCite: doc.cite.toUpperCase(), docTitle: doc.title,
+      docHeading: doc.docTitle || doc.title, docOrg: doc.org, docMeta: doc.meta, docFoot: doc.foot,
+      docPageNote: 'S. ' + (doc.page || 1) + ' / ' + (doc.pages || 1),
+      closeDoc: this.closeDoc,
+      hoverOpen: !!hp, hoverX: hp ? Math.max(250, Math.min(1400, hp.x)) : 0, hoverY: hp ? hp.y : 0,
+      hoverAnim: hp && hp.below ? 'evRisePopDown' : 'evRisePop',
+      hoverShift: hp && hp.below ? 'translate(-50%, 0)' : 'translate(-50%, -100%)',
+      hoverGap: hp && hp.below ? '14px' : '-14px',
+      hoverTitle: hdoc ? hdoc.title : '', hoverCite: hdoc ? hdoc.cite : '', hoverMeta: hdoc ? hdoc.meta : '',
+      hoverParas,
+      hoverCoverage: hdoc ? (hdoc.paras || []).length + ' av ' + (hdoc.pages || 1) + ' sider brukt i analysen' : '',
+      hoverBar: hdoc ? Math.min(100, Math.round(((hdoc.paras || []).length / (hdoc.pages || 1)) * 100)) : 0,
+      chronoRows: this.CHRONO,
+      highlightNote: s.warHi === 'time' ? 'MARKERT: TIDSPUNKT' : s.warHi === 'car' ? 'MARKERT: HØYRESVING' : 'INGEN MARKERING',
+      pdfRef: el => { this._pdf = el; },
+      askConflict: this.askConflict, askTimeline: this.askTimeline,
+      // 1 semantisk zoom
+      canvasRef: el => { this._canvas = el; },
+      onWheel: this.onWheel,
+      zoomScale: s.diving != null ? 3.4 : s.zoom,
+      zoomOrigin: s.origin,
+      zoomLabel: Math.round(s.zoom * 100) + '%',
+      diveFade: s.diving != null ? 0 : 1,
+      morphAxis: m > 0.3 ? 1 : 0,
+      axisTicks: this.BUCKETS.map((d, i) => ({ text: d + '.2023', left: +(8 + i * 10.5).toFixed(2) })),
+      zoomHint: m > 0.3 ? 'KRONOLOGI-MODUS · SCROLL INN FOR Å GÅ TILBAKE TIL LERRETET' : 'SCROLL FOR SEMANTISK ZOOM · DOBBELTKLIKK EN NODE FOR Å DYKKE INN I SAKSROM',
+      unsureLabelOpacity: m > 0.5 ? 1 : 0,
+      // 2 taktil fysikk
+      ripples: s.ripples, wireRef: el => { this._wire = el; },
+      wiring: !!s.wiring,
+      // 3 kognitiv belysning
+      chromeOpacity: s.screen === 'war' && s.dim ? 0.2 : 1,
+      wake: this.wake,
+      // 4 lyd
+      sound: s.sound, soundGlyph: s.sound ? '♪' : '⃠',
+      soundColor: s.sound ? '#6EE7C8' : '#5E7692',
+      toggleSound: () => this.setState({ sound: !s.sound }),
+      // 5 palett
+      paletteOpen: s.palette, paletteQuery: s.query, paletteResults,
+      hasSel: !!s.selText,
+      selPreview: s.selText ? '«' + (s.selText.length > 90 ? s.selText.slice(0, 90) + '…' : s.selText) + '»' : '',
+      openPalette: () => this.setState({ palette: true, query: '' }),
+      closePalette: () => this.setState({ palette: false }),
+      stop: e => e.stopPropagation(),
+      onPaletteInput: e => this.setState({ query: e.target.value }),
+      paletteRef: el => { if (el) setTimeout(() => el.focus(), 30); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+# Build output
+backend/saksrom-api/target/
+frontend/dist/
+frontend/node_modules/
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Lokale installere som ikke hører til repoet
+Claude Setup*.exe
+
+# OS
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# Env / secrets
+.env
+.env.local
+*.local.env
+
+# Logs and local data
+*.log
+backend/saksrom-api/data/

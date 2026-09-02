@@ -1,0 +1,509 @@
+EVIDA 2.0 — STATUS BUNDLE
+FORMAT_VERSION: 1
+LAST_UPDATED_UTC: 2026-09-02
+LAST_UPDATED_BY: Claude Code (fase 1 / pre-fase-2-forberedelse)
+REPOSITORY: F:\prosjekter_MAIN\EvidaNy2.0
+CURRENT_BRANCH: master
+HEAD_COMMIT: (ingen commit ennå — initial commit lages etter at denne filen er opprettet; oppdateres i follow-up)
+WORKTREE_STATUS: alle fase 1-filer untracked, klare for initial commit
+CURRENT_PHASE: Phase 1 complete / Phase 2 blocked
+CURRENT_GATE: Phase 2 cutover authorization (venter på eksplisitt godkjenning)
+PROJECT_STATE: SAFE_TO_CONTINUE (kun dokumentasjon/forberedelse tillatt)
+
+================================================================
+1. EXECUTIVE STATE
+================================================================
+
+EVIDA er et juridisk kommandosenter med kildebundet AI for advokater:
+dokumenter går Sak -> Import -> Karantene -> Verifisering -> Saksrom ->
+Analyse -> Utkast, og ingen AI-påstand presenteres som dokumentert uten
+gyldig kildeanker. Dette repoet (EvidaNy2.0) konsoliderer en eksisterende,
+testet Spring Boot-backend med en ny frontend bygget etter UI/UX-spec og
+Kirkerud mot Ås-prototypen.
+
+CURRENT_PHASE: Phase 1 complete / Phase 2 blocked
+LAST_COMPLETED_PHASE: Phase 1 (skjelett + styringsdokumenter, 2026-09-02)
+
+BUILD:
+Backend bor fortsatt i legacy-repo. Siste verifiserte build: PASS
+(fase 0, 2026-09-02, mot legacy WORKING TREE — se seksjon 13).
+Ingen kode i dette repoet bygger ennå (kun docs + struktur).
+
+TESTS:
+179 total / 176 passed / 0 failed / 3 environment-dependent skipped
+(kjørt 2026-09-02 mot legacy working tree, IKKE mot en ren commit)
+
+PRIMARY_BLOCKER:
+B-001/B-002: EVIDA_Backend_Architecture_v2.0.md og
+EVIDA_UI_UX_Specification.md mangler i docs/spec.
+B-004: cutover-SHA ikke valgt — og HELE canvas-funksjonen (V012 +
+canvas-pakken + permissions) er UKOMMITTERT i legacy (se seksjon 15).
+
+NEXT_GATE: Phase 2 cutover authorization — krever brukerbeslutning
+beskrevet i docs/progress/CUTOVER_RECOMMENDATION.md.
+
+SAFE_TO_CONTINUE: Ja, for dokumentasjon, spec-innlegging og read-only
+analyse. Nei, for migrering/kode.
+
+================================================================
+2. AUTHORITATIVE SOURCES
+================================================================
+
+I prioritetsrekkefølge ved konflikt:
+
+1. Eksplisitte låste beslutninger etter Architecture v2.0
+   -> CLAUDE.md (A-1..A-12) + docs/ADR/ADR-002..006
+2. docs/spec/EVIDA_Backend_Architecture_v2.0.md   — MISSING — BLOCKER (B-001)
+3. docs/spec/EVIDA_UI_UX_Specification.md         — MISSING — BLOCKER (B-002)
+4. Godkjente ADR-er: docs/ADR/ADR-001..005 (accepted), ADR-006 (draft)
+5. Eksisterende verifisert produktadferd (legacy-kode, fase 0-inventar:
+   docs/INVENTORY.md)
+6. CTO Backend Handoff v1                          — MISSING (B-003, lav)
+7. Prototype: docs/spec/prototype/ (UX-referanse, ALDRI teknisk fasit)
+
+Operasjonell status: status_bundle.txt (denne filen) — kan ALDRI
+overstyre specs/ADR-er. Ved uenighet er koden/repoet beviset og denne
+filen korrigeres.
+
+================================================================
+3. LOCKED DECISIONS
+================================================================
+
+- tenant_id er kanonisk; firm_id i Architecture v2.0 betyr tenant_id.
+  Ingen rename. Nye tabeller bruker tenant_id. (ADR-005, A-11)
+- Java 21 / Spring Boot 3.3.7 er backend-baseline. Ingen rewrite til
+  Python/FastAPI. Spec-prinsipper implementeres idiomatisk i Spring;
+  moden testet implementasjon vinner over teknologiforslag, avvik
+  dokumenteres i ADR. (A-12, ADR-001)
+- PostgreSQL 16 er operasjonell sannhetskilde. (A-3)
+- Originalkilder er immutable og versjonerte (documents-versjonering,
+  V010; supersede-semantikk).
+- AI kan aldri mutere verifisert sannhetstilstand direkte.
+- Evidence Compiler er obligatorisk arkitektur; Level 1 (source
+  integrity) er IKKE full grounding.
+  (docs/architecture/EVIDENCE_COMPILER_LEVELS.md)
+- Legacy-repo (F:\prosjekter_MAIN\EVIDA) er READ-ONLY til godkjent
+  cutover. Ingen cutover uten eksplisitt SHA/tag. (ADR-002)
+- Ingen autonom fase-avansering; hver fase har gate med rapport + stopp.
+- Ingen UI-komponenter kopieres fra legacy-frontend; kun lib-laget
+  gjenbrukes. (klarsignal fase 1, pkt 10)
+- RLS fra V013 (ENABLE + FORCE + policy; app-rolle eier ikke, ingen
+  BYPASSRLS). (ADR-004, A-9)
+- Temporal er target-kandidat, IKKE autorisert implementasjon.
+  (ADR-003 accepted, ADR-006 draft)
+- pgvector innføres ikke i denne runden. (ADR-003, A-5)
+- Flyway V001–V012 er frosset historikk, byte-identisk ved flytting.
+- Ingen rename cases->matters. UI sier «sak», API sier /cases. (A-6..A-8
+  øvrige: ingen LAG/issues/agents; Rettssalen uten egne tabeller;
+  case_canvases avgjør aldri eksport.)
+- All HTTP i ny frontend går gjennom frontend/src/api/client.ts. (A-10)
+
+================================================================
+4. CURRENT ARCHITECTURE
+================================================================
+
+CURRENT (verifisert i legacy, fase 0):
+- Én autoritativ backend: saksrom-api (Spring Boot 3.3.7, Java 21).
+  Eier auth (OAuth2/JWT resource server), tenant-isolasjon
+  (X-Evida-Tenant-ID matches token), policy, audit-hashkjede,
+  provider-policy m/ global kill switch.
+- Dokumentpipeline: karantene -> ClamAV -> godkjenning ->
+  ingestion_jobs (DB-kø m/ claim, heartbeat, stale-recovery) ->
+  sideenheter (document_source_units) -> SOURCE_READY/PARTIAL.
+- Kildebundet saksrom: ask/summary + SSE/NDJSON-strømmer m/ resume.
+- Databasen: PostgreSQL 16, Flyway V001–V012 (V012 KUN i working tree,
+  se seksjon 15), ingen RLS ennå.
+
+TARGET (dokumentert, ikke implementert):
+- Evidence Compiler Level 1–4 (docs/architecture/EVIDENCE_COMPILER_LEVELS.md)
+- SSE target-kontrakt (docs/architecture/SSE_EVENT_MAP.md)
+- OCR quality gate, 6 elementer (docs/architecture/OCR_QUALITY_GATE.md)
+- Eksportpredikater P-ACL/P-PRV/P-GRD/P-CNF/P-INT (docs/EXPORT_PREDICATES.md)
+- Statusprojeksjon 4 UI-tilstander (docs/STATUS_PROJECTION.md)
+
+PLANNED: V013–V017 (fase 5), grounding-gate L1 (fase 6),
+ny frontend fra prototype (fase 3–4).
+
+NOT IMPLEMENTED: Temporal, pgvector, RLS, Legal Authority Graph,
+agents, Rettssalen.
+
+BLOCKED: alt fase 2+ (se seksjon 15).
+
+================================================================
+5. IMPLEMENTATION STATUS
+================================================================
+
+(Alt «VERIFIED» = verifisert i legacy working tree, fase 0.)
+
+Immutable source hashing (sha256/file_hash/excerpt_sha256): VERIFIED
+ClamAV-adapter (+ dev bypass):                               VERIFIED
+Karantene-first dokumentlivssyklus:                          VERIFIED
+Duplikatkontroll (exists/check-duplicates/unique):           VERIFIED
+Versjonert erstatning m/ supersede (V010):                   VERIFIED
+Asynkron ingestion m/ heartbeat + stale recovery:            VERIFIED
+Audit-hashkjede + /audit/verify:                             VERIFIED
+Provider-policy + global kill switch:                        VERIFIED
+Source coverage:                                             VERIFIED
+Kildebundet ask/summary + SSE/NDJSON m/ resume:              VERIFIED
+Case canvas (V012 + endepunkter + permissions):  IMPLEMENTED_UNVERIFIED*
+  *tester passerte i working tree, men INGEN commit inneholder koden
+OCR confidence-gating (full gate):               PARTIAL (FU-064 BLOCKED)
+Evidence Compiler L1:                            NOT_STARTED (fase 6)
+Evidence Compiler L2/L3/L4:                      NOT_STARTED
+Eksportpredikater / leveranse-rom:               NOT_STARTED (fase 5)
+V013–V017:                                       PLANNED
+RLS:                                             PLANNED (fra V013)
+Temporal:                                        NOT_STARTED (ADR-006 draft)
+pgvector:                                        NOT_STARTED (avvist i v1)
+Ny frontend:                                     NOT_STARTED (fase 3–4)
+Legacy FastAPI backend-api:                      DEPRECATED (følger ikke med)
+Legacy Tauri desktop:                            DEPRECATED (følger ikke med)
+
+================================================================
+6. DATABASE / MIGRATIONS
+================================================================
+
+DATABASE: PostgreSQL 16 (target-image: postgres:16.14-alpine3.23)
+LATEST_FLYWAY_MIGRATION: V012 (OBS: V012 er untracked i legacy —
+  finnes kun i working tree; HEAD har V001–V011)
+NEXT_RESERVED_MIGRATION: V013 (source_disclosure_status)
+TENANT_COLUMN: tenant_id (kanonisk, ADR-005)
+RLS: ingen tabeller har RLS; obligatorisk fra V013 (ADR-004)
+PGVECTOR: ikke i bruk, ikke planlagt i v1 (ADR-003)
+
+V001 init: tenants, users, cases, documents, source_refs, audit_events
+V002 policies/devices/licenses
+V003 documents: QUARANTINE-status, file_hash, storage_path
+V004 documents: nullable case_id, file_size
+V005 documents: rejection_reason
+V006 documents: ingestion_error; document_source_units
+V007 operative_summaries (case_id er TEXT — kjent skjevhet)
+V008 audit_events.event_payload -> TEXT
+V009 parser_version; ingestion_jobs
+V010 dokumentversjonering m/ supersede
+V011 provider_policies
+V012 case_canvases (UNTRACKED i legacy — se B-006)
+
+Planlagt (fase 5): V013 source_disclosure_status, V014
+draft_basket_item, V015 observation/conflict/conflict_member, V016
+deliverable/export_job/matter_snapshot, V017 case_event. Alle med
+tenant_id + RLS etter ADR-004.
+
+================================================================
+7. API CONTRACT STATUS
+================================================================
+
+Implementert (legacy, verifisert fase 0 — full liste i docs/INVENTORY.md):
+- /api/auth/me
+- /api/v1/cases (POST/GET/DELETE)
+- /api/v1/documents (+ alias /api/documents): upload/replace/hash/
+  exists/check-duplicates/get/download/approve-ingestion/start-batch/
+  reject/archive/delete/ingest/source-units(+/window)
+- /api/documents/{id}/approve, /api/ingestion-jobs (+{id}, retry)
+- /api/saksrom: ask, ask/sse, summary, summary/stream, summary/sse,
+  source-coverage; /api/source-units/search
+- /api/v1/policy/effective, /api/v1/policy/ai-provider
+- /api/v1/audit/verify, /api/v1/audit/client-event
+- /api/v1/cases/{id}/canvas GET/PUT (KUN working tree, ukommittert)
+- /api/v1/exports/cases/{id}/source-report
+- CourtEngine + Enterprise-endepunkter (ingen skjermer besluttet,
+  se docs/SCREEN_MATRIX.md)
+
+Target (fase 5, ikke implementert):
+- GET /api/v1/cases/{id}/export-readiness
+- GET/POST /api/v1/cases/{id}/draft-basket
+- POST /api/v1/deliverables/{id}/export
+
+Ny frontend bruker /api/v1/documents (ikke alias). OpenAPI-generert
+types.ts er fase 4-krav (ingen håndskrevne typer).
+
+================================================================
+8. EVENT / SSE CONTRACT STATUS
+================================================================
+
+Autoritativ mapping: docs/architecture/SSE_EVENT_MAP.md
+
+Dagens events (kode): meta, stage, token, section_start, text_delta,
+citation, finding, warning, complete, done, error.
+Target (Vedlegg C): source.page_extracted, finding, conflict.detected,
+unsupported, done, error.
+Overlapp: finding/done/error. Manglende target-events innføres ADDITIVT
+i fase 5–6. Ingen rename/fjerning uten deprecation-runde i eventmappen.
+Uverifisert påstand: at prototypen viser target-navnene (sjekkes før
+fase 4).
+
+================================================================
+9. AI / RETRIEVAL / EVIDENCE COMPILER STATUS
+================================================================
+
+Retrieval: applikasjonsstyrt søk over kildeklare sideenheter. Ingen
+embeddings/pgvector. Kildebundne svar med sitater; unsupported-claim-
+refusal og prompt-injection-containment verifisert i legacy readiness-løp
+(synthetic data).
+
+Evidence Compiler:
+L1 source integrity: NOT_STARTED — fase 6-scope (referanse finnes +
+  sitat forekommer ordrett + hash matcher; feil -> unsupported-event).
+  Byggeklosser (source_units, hasher, statuser) finnes.
+L2 claim support / L3 adversarial / L4 legal authority: NOT_STARTED.
+  V015 observation legger grunnlag for L2-numeric/temporal.
+SPRÅKREGEL: L1 alene omtales som «kildeintegritet verifisert», aldri
+«grounded»/«verifisert» uten kvalifikasjon.
+
+Provider-policy: eksterne AI-kall disabled by default; global kill
+switch + tenant-godkjenning; audited mutasjon. VERIFIED (legacy).
+
+================================================================
+10. SECURITY STATUS
+================================================================
+
+- Tenant-isolasjon: applikasjonslag (TenantContextFilter,
+  AuthorizationService, tenant-skopede repos). Cross-tenant-tester
+  passerte fase 0. RLS mangler (kommer V013+).
+- X-Evida-Tenant-ID er klientpåstand; må matche token — fail closed.
+- RBAC: rollekart i AuthorizationService (OBS: canvas-permissions kun
+  i working tree).
+- Audit: hashkjede med previous_event_hash/event_hash, verify-endepunkt.
+- Ingen dokumenttekst i logger (verifisert i legacy readiness-løp).
+- Prod-oppstart fail-closed: HTTPS OIDC-issuer, MFA-evidens,
+  rolle-allowlist kreves (legacy compose/config).
+- Legacy status bundle (2026-07-30): first_user_allowed=false,
+  real_client_data_allowed=false. KUN syntetiske data er tillatt.
+- Dette repoet: ingen secrets committed; Claude Setup*.exe ignorert.
+
+================================================================
+11. FRONTEND STATUS
+================================================================
+
+Ny frontend: NOT_STARTED. Bygges i fase 3–4 fra prototype + UI/UX-spec
+(B-002 blokkerer fase 3).
+Struktur klargjort: frontend/src/{api,design,components,screens,domain,lib}.
+Gjenbruk fra legacy apps/web (kildeliste, ikke kopiert ennå): auth.ts,
+aiStream.ts (+streaming/), uploadQueue/uploadPreparation/uploadPolicy,
+hashWorker.ts, CitationManager.ts, sourceUnits.ts, canvasApi.ts, api.ts.
+OBS: flere av disse har ukommitterte endringer i legacy (auth.ts +8,
+aiStream.ts +28 m.fl.) — gjenbrukskilden må være samme snapshot som
+cutover (se CUTOVER_RECOMMENDATION.md).
+Legacy UI-komponenter: skal ALDRI migreres.
+Prototype-avvik: Canvas.dc.html fantes ikke i zip (B-005).
+
+================================================================
+12. INFRASTRUCTURE / DEPLOYMENT
+================================================================
+
+Docker runtime: TILGJENGELIG lokalt (Docker 29.4.0, verifisert
+2026-09-02).
+
+Anbefalt compose-kilde for docker-compose.dev.yml: BEKREFTET
+deploy/pilot/docker-compose.yml i legacy (clean/committed ved HEAD).
+Innhold (verifisert 2026-09-02):
+- gateway: nginx:1.28-alpine, porter 80/443, mounter ./nginx.conf +
+  ${EVIDA_TLS_CERT_DIR}
+- oauth2-proxy: v7.15.2, OIDC; krever EVIDA_OIDC_ISSUER/CLIENT_ID/
+  CLIENT_SECRET/OAUTH_COOKIE_SECRET/ALLOWED_EMAIL_DOMAIN/PUBLIC_HOST
+- web: build ../../apps/web (MÅ endres: ny frontend-path etter fase 3–4)
+- api: build ../../evida-core/services/saksrom-api (MÅ endres:
+  ../backend/saksrom-api etter cutover); env: DATABASE_URL/USER/PASSWORD,
+  LOCAL_DEV_MODE=false, ALLOWED_ORIGINS, JWT issuer, MFA-krav,
+  rolle-allowlist, ClamAV host/port, quarantine-root,
+  STORAGE_ENCRYPTION_ATTESTED, AI_PROVIDER_CALLS_ENABLED=false,
+  OCR-konfig; volum ${EVIDA_ENCRYPTED_DATA_DIR}:/data
+- postgres: 16.14-alpine3.23, volum ${EVIDA_ENCRYPTED_POSTGRES_DIR}
+- clamav: clamav/clamav:stable, named volume clamav_signatures
+- nett: edge + internal (internal: true)
+Secrets: alt via ${VAR:?}-krav — ingen hemmeligheter i filen. En dev-
+variant trenger forenkling (uten TLS/OIDC-proxy) — lages i fase 2 som
+docker-compose.dev.yml uten å endre pilotfilen.
+
+================================================================
+13. TEST STATUS
+================================================================
+
+LAST_TEST_COMMAND: .\mvnw.cmd test (i legacy evida-core/services/saksrom-api)
+LAST_TEST_TIME: 2026-09-02
+LAST_TEST_COMMIT: INGEN — kjørt mot legacy WORKING TREE på branch
+  codex/web-real-client-readiness (HEAD 9db7358 + ukommitterte endringer,
+  inkl. hele canvas-funksjonen)
+TOTAL: 179
+PASSED: 176
+FAILED: 0
+SKIPPED: 3 (miljøavhengige, 2 i PdfBoxDocumentParserTest)
+RESULT: BUILD SUCCESS
+
+TEST_STATE: VALID for working-tree-snapshotet, men IKKE reprodusberbar
+fra noen commit. En ren test-run fra valgt cutover-commit er
+obligatorisk fase 2-gate (skal gi samme resultat; avvik på én test er
+blokkering).
+
+Web-tester (legacy, 2026-08-01-evidens): 212 web + 17 pilotskript —
+IKKE re-kjørt av dette prosjektet; regnes som historisk evidens.
+
+Dette repoet: ingen kode, ingen tester å kjøre.
+
+================================================================
+14. FIRST USER READINESS
+================================================================
+
+Kanonisk matrise: docs/FIRST_USER_READINESS_MATRIX.md (byte-identisk
+kopi fra legacy). Legacy-bundle (2026-07-30): status=blocked,
+first_user_allowed=false, real_client_data_allowed=false.
+Gjenstående P0 er eksterne gates (målmaskin-kryptering, signering,
+managed-machine smoke, live OIDC/HTTPS, DPA/godkjenninger) + FU-064
+(OCR-gating). EVIDA 2.0 endrer ingen readiness-rad før nye løp kjøres
+fra dette repoet. KUN syntetiske/redigerte data er tillatt.
+
+================================================================
+15. BLOCKERS
+================================================================
+
+B-001
+Severity: HARD | Status: OPEN
+EVIDA_Backend_Architecture_v2.0.md mangler i docs/spec.
+Blocks: fase 3–6-implementasjon; verifikasjon av RLS-mønster (kap 67.3).
+Resolution: bruker legger autoritativ fil i docs/spec; innhold
+verifiseres; docs/spec/README.md oppdateres.
+
+B-002
+Severity: HARD | Status: OPEN
+EVIDA_UI_UX_Specification.md mangler i docs/spec.
+Blocks: fase 3 (designsystem), fase 4 (skjermer).
+Resolution: som B-001. Prototypen er IKKE erstatning.
+
+B-003
+Severity: SOFT | Status: OPEN
+CTO-handoff_Backend_v1.md mangler (docx i legacy dekker annet tema).
+Blocks: ingenting direkte (prioritet 5).
+Resolution: bruker avklarer om dokumentet finnes.
+
+B-004
+Severity: HARD | Status: OPEN
+Cutover-SHA/tag ikke valgt for fase 2.
+Blocks: fase 2.
+Resolution: brukerbeslutning per docs/progress/CUTOVER_RECOMMENDATION.md.
+
+B-005
+Severity: MEDIUM | Status: OPEN
+Canvas.dc.html fantes ikke i prototype-zip.
+Blocks: deler av fase 3-tokenekstraksjon (lerretsflaten).
+Resolution: bruker finner filen, eller lerret ekstraheres fra
+hovedprototypen.
+
+B-006
+Severity: HARD | Status: OPEN
+Hele canvas-funksjonen er UKOMMITTERT i legacy: V012-migrasjonen,
+canvas/-pakken (main+test) er untracked; Permission.java og
+AuthorizationService.java er modifisert. HEAD (9db7358) har kun
+V001–V011 og kompilerer uten canvas — men fase 0-inventaret og
+skjermmatrisen (Sakslerret KOBLET) forutsetter V012.
+Blocks: fase 2 (cutover fra HEAD ville tapt canvas; kopiering fra
+working tree er forbudt).
+Resolution: bruker godkjenner én scoped commit i legacy som fanger
+canvas-funksjonen (se CUTOVER_RECOMMENDATION.md), eller beslutter å
+utsette canvas.
+
+================================================================
+16. KNOWN RISKS / TECH DEBT
+================================================================
+
+- V001–V012 uten RLS; kun applikasjonshåndhevet tenant-isolasjon
+  (retrofit er eget fremtidig prosjekt, ADR-004).
+- operative_summaries.case_id er TEXT (skjevhet; V013+ må ikke arve).
+- DocumentController har dobbel rute (/api/v1/documents + /api/documents);
+  alias bør deprecates etter fase 4.
+- Fase 0-testtallet er working-tree-basert (se seksjon 13).
+- SSE-kontrakten har uverifisert påstand om prototypens eventnavn.
+- Legacy-repo inneholder 75 untracked filer og løse dokumenter i rot;
+  kun definert cutover-sett skal med.
+- ~30 MB prototype-bilder ligger i docs/spec/prototype/uploads (bevisst:
+  designbrief-materiale).
+
+================================================================
+17. LAST MATERIAL CHANGES
+================================================================
+
+2026-09-02 (fase 1 + pre-fase-2):
+- Repo initialisert (git init), målstruktur opprettet.
+- ADR-001 kopiert (SHA-256-verifisert); ADR-002..005 skrevet (accepted);
+  ADR-006 skrevet (draft).
+- INVARIANTS.md + FIRST_USER_READINESS_MATRIX.md kopiert byte-identisk.
+- CLAUDE.md (regler, A-1..A-12, PR-mal) + README.md + .gitignore.
+- docs/architecture/: ASYNC_WORKFLOWS, SSE_EVENT_MAP,
+  EVIDENCE_COMPILER_LEVELS, OCR_QUALITY_GATE.
+- docs/: SCREEN_MATRIX (verifiserte ruter), STATUS_PROJECTION,
+  EXPORT_PREDICATES, INVENTORY (fase 0).
+- Prototype pakket ut til docs/spec/prototype/ (Canvas.dc.html manglet).
+- docs/progress/PHASE_1_REPORT.md.
+- status_bundle.txt opprettet (denne filen); STATUS BUNDLE RULE lagt i
+  CLAUDE.md.
+- Read-only cutover-analyse av legacy utført; B-006 oppdaget (canvas
+  ukommittert); CUTOVER_RECOMMENDATION.md skrevet.
+- Compose-vurdering: deploy/pilot/docker-compose.yml bekreftet som
+  kilde; Docker 29.4.0 tilgjengelig.
+
+================================================================
+18. NEXT ALLOWED ACTIONS
+================================================================
+
+ALLOWED:
+1. Legge autoritative specs i docs/spec (bruker) og verifisere innhold.
+2. Oppdatere docs/spec/README.md når specs ankommer.
+3. Lese/analysere legacy-repo (read-only).
+4. Motta og registrere brukerens cutover-beslutning (SHA/tag + hva som
+   skjer med canvas-endringene).
+5. Oppdatere status_bundle.txt ved enhver materiell endring.
+6. Små semantiske commits av dokumentasjon i DETTE repoet.
+
+NOT YET ALLOWED:
+- Fase 2-migrering (kopiering av backend/compose/lib-filer)
+- Commit eller ARCHIVED.md i legacy-repo
+- V013+ migrasjoner
+- Temporal-implementasjon
+- pgvector
+- Frontend-bygging (fase 3–4)
+- Agent-/Rettssal-implementasjon
+- Endring av readiness-radene
+
+================================================================
+19. DO NOT DO
+================================================================
+
+DO NOT:
+- modify legacy repository before explicit approval;
+- cut over from an uncommitted working tree;
+- rename tenant_id to firm_id;
+- rewrite Spring backend in Python;
+- bypass tests or claim a test passed unless actually executed;
+- weaken provenance requirements;
+- treat LLM confidence as truth;
+- let AI write directly to verified truth state;
+- treat Evidence Compiler Level 1 as complete grounding;
+- introduce Temporal merely because target architecture mentions it;
+- introduce Neo4j/vector DB/microservices without measured need;
+- migrate legacy UI components into the new UI;
+- advance to another phase without the required gate;
+- edit/renumber/merge Flyway V001–V012;
+- commit secrets, build binaries, or Claude Setup*.exe;
+- let a commit represent newer state than status_bundle.txt.
+
+================================================================
+20. HANDOFF TO NEXT AGENT
+================================================================
+
+READ FIRST:
+1. status_bundle.txt (denne filen)
+2. CLAUDE.md
+3. docs/spec/README.md
+4. docs/progress/CUTOVER_RECOMMENDATION.md
+5. docs/INVENTORY.md (fase 0-fakta) + relevante ADR-er (002, 005, 006)
+
+CURRENT TASK:
+Vent på brukerbeslutning for fase 2-gaten: (a) cutover-SHA/tag i legacy,
+(b) håndtering av ukommittert canvas-funksjon (B-006), (c) godkjenning
+av ARCHIVED.md i legacy ved cutover. Spec-filene (B-001/B-002) må inn
+før fase 3.
+
+STOP CONDITION:
+IKKE start fase 2 (kopiering fra legacy) uten eksplisitt
+brukergodkjenning med SHA/tag. IKKE skriv til legacy-repo. Ved fullført
+fase 2 (senere): tester fra cutover-commit skal matche fase 0-resultatet
+(179/0 feil/3 skip); avvik på én test er blokkering, ikke støy.
