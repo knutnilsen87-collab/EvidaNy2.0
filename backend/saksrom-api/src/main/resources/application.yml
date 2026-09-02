@@ -1,0 +1,90 @@
+server:
+  port: ${EVIDA_API_PORT:8080}
+
+spring:
+  application:
+    name: evida-api
+
+  servlet:
+    multipart:
+      # Aligned with evida.documents.max-file-size-bytes (100MB default). Without this,
+      # Tomcat's 1MB default rejects normal legal PDFs with HTTP 413 before EVIDA's own
+      # streaming size validation ever runs (DEFECT-P5-1).
+      max-file-size: ${EVIDA_MULTIPART_MAX_FILE_SIZE:100MB}
+      max-request-size: ${EVIDA_MULTIPART_MAX_REQUEST_SIZE:100MB}
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/evida}
+    username: ${DATABASE_USER:evida}
+    password: ${DATABASE_PASSWORD:evida_dev_password}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,flyway
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+
+evida:
+  storage:
+    quarantine-root: ${EVIDA_STORAGE_QUARANTINE_ROOT:./data/quarantine}
+    encryption-attested: ${EVIDA_STORAGE_ENCRYPTION_ATTESTED:false}
+  security:
+    local-dev-mode: ${EVIDA_LOCAL_DEV_MODE:true}
+    allowed-origins: ${EVIDA_ALLOWED_ORIGINS:}
+    mfa-required: ${EVIDA_MFA_REQUIRED:false}
+    mfa-accepted-amr: ${EVIDA_MFA_ACCEPTED_AMR:mfa,otp,hwk}
+    mfa-accepted-acr: ${EVIDA_MFA_ACCEPTED_ACR:}
+    allowed-roles: ${EVIDA_ALLOWED_ROLES:OWNER,ADMIN,TENANT_ADMIN,SYSTEM_ADMIN,LAWYER,CASE_WORKER,VIEWER,AUDITOR,SECURITY_ADMIN}
+    malware-scanner-configured: ${EVIDA_MALWARE_SCANNER_CONFIGURED:false}
+    malware-scan-enabled: ${EVIDA_MALWARE_SCAN_ENABLED:false}
+    malware-scan-host: ${EVIDA_MALWARE_SCAN_HOST:127.0.0.1}
+    malware-scan-port: ${EVIDA_MALWARE_SCAN_PORT:3310}
+    malware-scan-timeout-millis: ${EVIDA_MALWARE_SCAN_TIMEOUT_MILLIS:5000}
+  ai:
+    provider-calls-enabled: ${EVIDA_AI_PROVIDER_CALLS_ENABLED:false}
+  streaming:
+    # SSE transport tuning for token-by-token AI responses. Perceived reading speed is paced on the
+    # client (see apps/web streamingConfig.ts); these only control transport timeout/keepalive and an
+    # optional deliberate server delay (0 = stream as fast as tokens are produced, lowest TTFT).
+    timeout-millis: ${EVIDA_STREAMING_TIMEOUT_MILLIS:120000}
+    heartbeat-millis: ${EVIDA_STREAMING_HEARTBEAT_MILLIS:15000}
+    server-token-delay-millis: ${EVIDA_STREAMING_SERVER_TOKEN_DELAY_MILLIS:0}
+  documents:
+    raw-upload-allowed: ${EVIDA_RAW_DOCUMENT_UPLOAD_ALLOWED:false}
+    max-file-size-bytes: ${EVIDA_MAX_DOCUMENT_UPLOAD_BYTES:104857600}
+  ingestion:
+    worker-fixed-delay-ms: ${EVIDA_INGESTION_WORKER_DELAY_MS:5000}
+    # Stale RUNNING recovery (DEFECT-P5-2): jobs whose heartbeat (locked_at, refreshed on
+    # every page-progress update) is older than this are reset RUNNING -> PENDING so the
+    # worker can reclaim and resume from the first missing page after a hard crash.
+    stale-running-timeout-seconds: ${EVIDA_INGESTION_STALE_RUNNING_TIMEOUT_SECONDS:900}
+    stale-recovery-fixed-delay-ms: ${EVIDA_INGESTION_STALE_RECOVERY_DELAY_MS:60000}
+  parser:
+    ocr-enabled: ${EVIDA_OCR_ENABLED:true}
+    ocr-text-threshold-chars: ${EVIDA_PARSER_OCR_TEXT_THRESHOLD_CHARS:40}
+    ocr-dpi: ${EVIDA_PARSER_OCR_DPI:300}
+    ocr-retry-dpi: ${EVIDA_PARSER_OCR_RETRY_DPI:400}
+    ocr-min-confidence: ${EVIDA_PARSER_OCR_MIN_CONFIDENCE:0.55}
+    ocr-enhancement-enabled: ${EVIDA_PARSER_OCR_ENHANCEMENT_ENABLED:true}
+    ocr-timeout-seconds: ${EVIDA_PARSER_OCR_TIMEOUT_SECONDS:60}
+    tessdata-path: ${EVIDA_TESSDATA_PATH:./data/tessdata}
+    tesseract-path: ${EVIDA_TESSERACT_PATH:}
+    ocr-languages: ${EVIDA_OCR_LANGUAGES:nor+eng}
+    max-pages-per-document: ${EVIDA_PARSER_MAX_PAGES:20000}

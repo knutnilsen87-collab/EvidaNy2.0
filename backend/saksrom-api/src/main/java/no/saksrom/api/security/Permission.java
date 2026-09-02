@@ -1,0 +1,20 @@
+package no.saksrom.api.security;
+
+public enum Permission {
+    DOCUMENT_UPLOAD,
+    DOCUMENT_LIST,
+    DOCUMENT_READ,
+    DOCUMENT_APPROVE,
+    DOCUMENT_REJECT,
+    DOCUMENT_DELETE,
+    SOURCE_READ,
+    SAKSROM_ASK,
+    CASE_CREATE,
+    CASE_READ,
+    CASE_CANVAS_READ,
+    CASE_CANVAS_WRITE,
+    CASE_DELETE,
+    EXPORT_CREATE,
+    AUDIT_VERIFY,
+    ADMIN_TENANT
+}
