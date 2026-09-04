@@ -1,8 +1,17 @@
 EVIDA 2.0 — STATUS BUNDLE
 FORMAT_VERSION: 1
-LAST_UPDATED_UTC: 2026-09-03
-LAST_UPDATED_BY: Claude Code (fase 2 cutover)
+LAST_UPDATED_UTC: 2026-09-04
+LAST_UPDATED_BY: Claude Code (git-opprydding + remote-sync)
 REPOSITORY: F:\prosjekter_MAIN\EvidaNy2.0
+REMOTE: https://github.com/knutnilsen87-collab/EvidaNy2.0.git (origin,
+  branch master pushet og i sync)
+LEGACY_REMOTE: https://github.com/knutnilsen87-collab/EvidaWeb.git
+  (arkiv; fryse-commit d92aef0 + tag evida-v2-cutover + ARCHIVED.md pushet)
+DRIVE_SYNC: Rotmappen (F:\prosjekter_MAIN\EvidaNy2.0) er synkronisert i
+  brukerens Google Drive under samme navn, slik at arbeid kan fortsette
+  fra andre maskiner. OBS: Git er sannhetskilden — GitHub-remoten er
+  autoritativ delingskanal; Drive-sync av .git/ kan gi lock-/konflikt-
+  filer, så ved avvik gjelder git-historikken.
 CURRENT_BRANCH: master
 HEAD_COMMIT: 20e0995 chore(deploy) + påfølgende "docs: complete EVIDA
   phase 2 cutover" (denne filen committes i den) — verifiser med git log
