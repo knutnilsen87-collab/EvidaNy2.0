@@ -6,7 +6,10 @@ REPOSITORY: F:\prosjekter_MAIN\EvidaNy2.0
 REMOTE: https://github.com/knutnilsen87-collab/EvidaNy2.0.git (origin,
   branch master pushet og i sync)
 LEGACY_REMOTE: https://github.com/knutnilsen87-collab/EvidaWeb.git
-  (arkiv; fryse-commit d92aef0 + tag evida-v2-cutover + ARCHIVED.md pushet)
+  (arkiv; fryse-commit d92aef0 + ARCHIVED.md-commit e726270 pushet på
+  branch codex/web-real-client-readiness. Taggen evida-v2-cutover finnes
+  KUN lokalt — push ble blokkert av verktøy-policy; bruker må kjøre
+  `git push origin evida-v2-cutover` fra F:\prosjekter_MAIN\EVIDA)
 DRIVE_SYNC: Rotmappen (F:\prosjekter_MAIN\EvidaNy2.0) er synkronisert i
   brukerens Google Drive under samme navn, slik at arbeid kan fortsette
   fra andre maskiner. OBS: Git er sannhetskilden — GitHub-remoten er
